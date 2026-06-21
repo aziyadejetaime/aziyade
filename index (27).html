@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>46 jours</title>
+<style>
+  :root{
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --ink: #2c2620;
+    --ink-soft: #6b6258;
+    --accent: #c8654a;
+    --accent-soft: #f0ddd6;
+    --line: rgba(44,38,32,0.12);
+    --locked: #ece6dc;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+  body{
+    display:flex; flex-direction:column; align-items:center;
+    padding: 24px 16px 80px;
+  }
+  .wrap{ width:100%; max-width: 480px; }
+
+  @media (min-width: 700px){
+    body{ background: var(--locked); padding: 40px 16px; }
+    .wrap{
+      background: var(--bg);
+      border-radius: 32px;
+      padding: 32px 20px 60px;
+      box-shadow: 0 20px 60px rgba(44,38,32,0.15), 0 0 0 1px var(--line);
+      min-height: 80vh;
+    }
+  }
+
+  /* ---------- LOCK SCREEN ---------- */
+  #lock-screen{
+    min-height: 80vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    width:100%;
+  }
+  .lock-icon{
+    width:56px; height:56px; border-radius:50%;
+    background: var(--accent-soft);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 20px;
+  }
+  .lock-icon svg{ width:24px; height:24px; stroke: var(--accent); }
+  #lock-screen h1{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+  #lock-screen p{
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height:1.6;
+    max-width: 320px;
+    margin-bottom: 28px;
+  }
+  #pwd-form{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    width:100%; max-width: 260px;
+  }
+  #pwd-input{
+    width:100%;
+    text-align:center;
+    font-size: 20px;
+    letter-spacing: 4px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    font-family: var(--sans);
+  }
+  #pwd-input:focus{ outline:none; border-color: var(--accent); }
+  #pwd-submit{
+    width:100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    cursor:pointer;
+  }
+  #pwd-submit:active{ transform: scale(0.98); }
+  #pwd-error{
+    color: var(--accent);
+    font-size: 13px;
+    min-height: 18px;
+  }
+
+  /* ---------- MAIN APP ---------- */
+  #app{ display:none; width:100%; }
+  #app.visible{ display:block; }
+
+  header{ text-align:center; margin-bottom: 28px; }
+  .eyebrow{
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  h1.title{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 32px;
+  }
+
+  .progress-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .progress-bar{
+    height: 6px;
+    background: var(--locked);
+    border-radius: 4px;
+    overflow:hidden;
+    margin-bottom: 10px;
+  }
+  .progress-fill{
+    height:100%;
+    background: var(--accent);
+    border-radius:4px;
+    transition: width 0.6s ease;
+  }
+  .progress-text{
+    text-align:center;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .progress-text b{ color: var(--ink); font-weight: 600; }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 7px;
+    margin-bottom: 28px;
+  }
+  .day-cell{
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 13px;
+    font-weight: 600;
+    cursor:pointer;
+    border: 1px solid transparent;
+    background: var(--locked);
+    color: #a39d90;
+    position:relative;
+  }
+  .day-cell.unlocked{
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .day-cell.today{
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .day-cell.locked svg{ width:13px; height:13px; stroke:#a39d90; }
+  .day-cell.viewed::after{
+    content:'';
+    position:absolute; top:4px; right:4px;
+    width:5px; height:5px; border-radius:50%;
+    background: currentColor;
+    opacity:0.5;
+  }
+
+  #content-panel{ display:none; }
+  #content-panel.visible{
+    display:flex;
+    position:fixed;
+    inset:0;
+    z-index: 50;
+    align-items:flex-end;
+    justify-content:center;
+    background: rgba(20,16,12,0);
+    backdrop-filter: blur(0px);
+    animation: overlay-in 0.4s ease forwards;
+  }
+  @keyframes overlay-in{
+    to{ background: rgba(20,16,12,0.55); backdrop-filter: blur(3px); }
+  }
+
+  .content-card{
+    background: var(--card);
+    border-radius: 26px 26px 0 0;
+    padding: 10px 22px 32px;
+    max-width: 460px;
+    width:100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    animation: card-open 0.55s cubic-bezier(.16,1,.3,1) forwards;
+    animation-delay: 0.05s;
+    position: relative;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+  }
+  @media (min-width: 480px){
+    #content-panel.visible{ align-items:center; }
+    .content-card{
+      border-radius: 22px;
+      transform: scale(0.92) translateY(20px);
+    }
+    @keyframes card-open{
+      to{ transform: scale(1) translateY(0); }
+    }
+  }
+  @keyframes card-open{
+    to{ transform: translateY(0); }
+  }
+
+  .drag-handle{
+    width: 38px; height: 4px;
+    background: var(--line);
+    border-radius: 4px;
+    margin: 10px auto 18px;
+  }
+  @media (min-width: 480px){ .drag-handle{ display:none; } }
+
+  .close-card{
+    position: absolute;
+    top:16px; right:16px;
+    width:30px; height:30px;
+    border-radius:50%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color: var(--ink-soft);
+    font-size: 18px;
+    line-height: 1;
+    z-index: 5;
+  }
+
+  .reveal{
+    opacity:0;
+    animation: reveal-up 0.55s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes reveal-up{ from{opacity:0; transform:translateY(14px) scale(0.98);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+  .content-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .content-photo{
+    width:100%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    background: var(--locked);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 16px;
+    color: #a39d90;
+    font-size: 12px;
+    overflow:hidden;
+  }
+  .content-photo img{ width:100%; height:100%; object-fit:cover; }
+  .photo-caption{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: -8px 0 16px;
+    font-style: italic;
+  }
+  .content-text{
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .content-text.placeholder{ color: var(--ink-soft); font-style: italic; font-family: var(--sans); font-size: 14px; }
+
+  .empty-state{
+    text-align:center;
+    padding: 30px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen">
+    <div class="lock-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+    </div>
+    <h1>46 jours</h1>
+    <p>Pour ouvrir, il te faut une date.<br>Une date qu'on n'oublie pas.</p>
+    <form id="pwd-form" autocomplete="off">
+      <input type="text" id="pwd-input" inputmode="numeric" placeholder="________" maxlength="20">
+      <button type="submit" id="pwd-submit">Ouvrir</button>
+      <div id="pwd-error"></div>
+    </form>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+    <header>
+      <div class="eyebrow">8 juillet — 23 août</div>
+      <h1 class="title">46 jours</h1>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-text" id="progress-text"></div>
+    </div>
+
+    <div class="grid" id="day-grid"></div>
+
+    <div id="content-panel">
+      <div class="content-card" id="content-card"></div>
+    </div>
+
+    <footer>fait avec beaucoup trop d'amour</footer>
+  </div>
+
+</div>
+
+<script>
+/* ====================================================
+   CONFIGURATION — a adapter
+   ==================================================== */
+
+// Date du jour 1 (premiere journee sans se voir)
+const START_DATE = new Date(2026, 6, 8); // mois = index 0, donc 6 = juillet
+const TOTAL_DAYS = 46;
+
+// Mot de passe attendu (chiffres uniquement). A remplacer par la vraie date.
+const PASSWORD = "09012026"; // date ou vous avez commence a vous parler
+
+// MODE APERCU — mettre a true pour debloquer tous les jours pendant la construction.
+// Repasser a false avant d'envoyer le site a Aziyade !
+const PREVIEW_MODE = true;
+
+// Contenu de chaque jour. type: "memory" | "reason" | "quiz" | "challenge" | "photo"
+// Laisse vide / placeholder pour l'instant, a remplir ensemble.
+const CONTENT = {
+  1: {
+    type: "memory",
+    text: "Premier jour sans toi.<br><br>Ca me rappelle un autre premier jour. Le 9 janvier. Le jour ou on a commence a se parler.<br><br>Moins de deux semaines apres, on faisait deja tout comme un couple.",
+    photos: [
+      { src: "images/1.jpg", caption: "Le resto organise avec les gens de SES. La premiere fois qu'on se voyait en vrai, et le premier bisou." },
+      { src: "images/2.jpg", caption: "Une de nos premieres soirees, chez Thais." }
+    ]
+  },
+  2: { type: "reason", text: "PLACEHOLDER — une raison pour laquelle je t'aime.", photo: null },
+  3: { type: "challenge", text: "PLACEHOLDER — un petit defi pour aujourd'hui.", photo: null },
+  // ... continuer jusqu'a 46
+  46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
+};
+
+const TAG_LABELS = {
+  memory: "Un souvenir",
+  reason: "Pourquoi je t'aime",
+  quiz: "Petit quiz",
+  challenge: "Defi du jour",
+  photo: "Une photo"
+};
+
+/* ==================================================== */
+
+function daysSinceStart(){
+  const now = new Date();
+  const start = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.floor((today - start) / 86400000) + 1;
+  return diff;
+}
+
+function unlockedCount(){
+  if (PREVIEW_MODE) return TOTAL_DAYS;
+  const d = daysSinceStart();
+  if (d < 1) return 0;
+  if (d > TOTAL_DAYS) return TOTAL_DAYS;
+  return d;
+}
+
+function buildGrid(){
+  const grid = document.getElementById('day-grid');
+  grid.innerHTML = '';
+  const unlocked = unlockedCount();
+
+  for(let i = 1; i <= TOTAL_DAYS; i++){
+    const cell = document.createElement('div');
+    cell.className = 'day-cell';
+    cell.dataset.day = i;
+
+    if(!PREVIEW_MODE && i === unlocked && i <= TOTAL_DAYS && unlocked > 0){
+      cell.classList.add('today');
+      cell.textContent = i;
+    } else if(i <= unlocked){
+      cell.classList.add('unlocked');
+      cell.textContent = i;
+    } else {
+      cell.classList.add('locked');
+      cell.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>';
+    }
+
+    if(i <= unlocked){
+      cell.addEventListener('click', () => showDay(i));
+    }
+    grid.appendChild(cell);
+  }
+
+  const fillPct = Math.round((unlocked / TOTAL_DAYS) * 100);
+  document.getElementById('progress-fill').style.width = fillPct + '%';
+
+  let progressText;
+  if(unlocked === 0){
+    progressText = "Pas encore commence";
+  } else if(unlocked >= TOTAL_DAYS){
+    progressText = "<b>Les 46 jours</b> sont passes. On se retrouve.";
+  } else {
+    progressText = `<b>${unlocked}</b> jour${unlocked>1?'s':''} debloque${unlocked>1?'s':''}, <b>${TOTAL_DAYS-unlocked}</b> a venir`;
+  }
+  document.getElementById('progress-text').innerHTML = progressText;
+}
+
+function showDay(day){
+  document.querySelectorAll('.day-cell').forEach(c => {
+    if(parseInt(c.dataset.day) === day) c.classList.add('viewed');
+  });
+
+  const panel = document.getElementById('content-panel');
+  const card = document.getElementById('content-card');
+  panel.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+
+  const data = CONTENT[day];
+  let delay = 0;
+  const step = 0.12;
+
+  if(!data){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal">Jour ${day}</div>
+      <div class="empty-state reveal">Le contenu de ce jour n'a pas encore ete ecrit.</div>
+    `;
+  } else {
+    const isPlaceholder = data.text.startsWith('PLACEHOLDER');
+    let photosHtml = '';
+    if(data.photos && data.photos.length){
+      photosHtml = data.photos.map(p => {
+        delay += step;
+        return `
+        <div class="content-photo reveal" style="aspect-ratio:auto; animation-delay:${delay}s;">
+          <img src="${p.src}" alt="">
+        </div>
+        ${p.caption ? `<p class="photo-caption reveal" style="animation-delay:${delay + 0.05}s;">${p.caption}</p>` : ''}
+      `;
+      }).join('');
+    } else if(data.photo) {
+      delay += step;
+      photosHtml = `<div class="content-photo reveal" style="animation-delay:${delay}s;"><img src="${data.photo}" alt=""></div>`;
+    } else if(data.type === 'memory' || data.type === 'photo') {
+      delay += step;
+      photosHtml = `<div class="content-photo reveal" style="animation-delay:${delay}s;">photo a venir</div>`;
+    }
+    delay += step;
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS[data.type] || 'Jour ' + day}</div>
+      ${photosHtml}
+      <div class="content-text ${isPlaceholder ? 'placeholder' : ''} reveal" style="animation-delay:${delay}s;">${data.text}</div>
+    `;
+  }
+}
+
+function closeDay(){
+  const panel = document.getElementById('content-panel');
+  panel.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('content-panel');
+  if(panel.classList.contains('visible') && e.target === panel){
+    closeDay();
+  }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeDay();
+});
+
+document.getElementById('pwd-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const val = document.getElementById('pwd-input').value.trim();
+  const errorEl = document.getElementById('pwd-error');
+
+  if(val === PASSWORD){
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    buildGrid();
+  } else {
+    errorEl.textContent = "Ce n'est pas la bonne date...";
+    document.getElementById('pwd-input').value = '';
+  }
+});
+</script>
+
+</body>
+</html>
