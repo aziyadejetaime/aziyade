@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -346,7 +347,82 @@
     z-index: 101;
   }
 
-  /* ---------- MEMORY GAME ---------- */
+  /* ---------- WORD PUZZLE (glisser-deposer) ---------- */
+  .puzzle-slots{
+    display:flex; flex-wrap:wrap;
+    gap: 8px;
+    min-height: 46px;
+    padding: 14px;
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    background: var(--accent-soft);
+    margin-bottom: 18px;
+  }
+  .puzzle-slots.empty::before{
+    content: "depose les mots ici";
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-style: italic;
+  }
+  .puzzle-bank{
+    display:flex; flex-wrap:wrap;
+    gap: 8px;
+    min-height: 46px;
+  }
+  .puzzle-word{
+    padding: 9px 14px;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 20px;
+    font-family: var(--serif);
+    font-size: 15px;
+    color: var(--ink);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  }
+  .puzzle-word:active{ cursor: grabbing; }
+  .puzzle-word.dragging{
+    opacity: 0.4;
+  }
+  .puzzle-word.drag-ghost{
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    transform: scale(1.05) rotate(-2deg);
+  }
+  .puzzle-check{
+    width:100%;
+    margin-top: 6px;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .puzzle-check:disabled{ opacity: 0.4; cursor:not-allowed; }
+  .puzzle-feedback{
+    text-align:center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    min-height: 18px;
+  }
+  .puzzle-feedback.wrong{ color: #b5573f; }
+  .puzzle-win-text{
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink);
+    text-align:center;
+    padding: 20px 4px;
+  }
   .memory-intro{
     font-family: var(--serif);
     font-size: 16px;
@@ -545,6 +621,12 @@ const CONTENT = {
       { src: "images/3.jpg", caption: "Le tout premier selfie. 29 janvier." }
     ]
   },
+  4: {
+    type: "wordpuzzle",
+    text: "Les mots sont dans le desordre. Remets-les pour trouver une raison de t'aimer.",
+    words: ["Tu", "es", "rayonnante,", "ne", "change", "jamais,", "je", "t'aime."],
+    winText: "Tu es rayonnante, ne change jamais, je t'aime."
+  },
   // ... continuer jusqu'a 46
   46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -555,7 +637,8 @@ const TAG_LABELS = {
   quiz: "Petit quiz",
   challenge: "Defi du jour",
   photo: "Une photo",
-  minigame: "Petit jeu"
+  minigame: "Petit jeu",
+  wordpuzzle: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -651,6 +734,15 @@ function showDay(day){
       <div id="memory-root"></div>
     `;
     initMemoryGame(data);
+  } else if(data.type === 'wordpuzzle'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS[data.type] || 'Jour ' + day}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="puzzle-root"></div>
+    `;
+    initWordPuzzle(data);
   } else {
     const isPlaceholder = data.text.startsWith('PLACEHOLDER');
     let photosHtml = '';
@@ -798,6 +890,149 @@ function showMemoryWin(data){
     <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.minigame}</div>
     <div class="memory-win-text reveal" style="animation-delay:0.08s;">${data.winText || data.text}</div>
     <div class="memory-recap">${recapHtml}</div>
+  `;
+}
+
+/* ---------- WORD PUZZLE (glisser-deposer mots dans l'ordre) ---------- */
+function initWordPuzzle(data){
+  const target = data.words;
+  const root = document.getElementById('puzzle-root');
+
+  // melange (different de l'ordre cible)
+  let shuffled;
+  do {
+    shuffled = [...target];
+    for(let i = shuffled.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+  } while(shuffled.join(' ') === target.join(' '));
+
+  root.innerHTML = `
+    <div class="puzzle-slots empty" id="puzzle-slots"></div>
+    <div class="puzzle-bank" id="puzzle-bank"></div>
+    <button class="puzzle-check" id="puzzle-check" disabled>Verifier</button>
+    <div class="puzzle-feedback" id="puzzle-feedback"></div>
+  `;
+
+  const slotsEl = document.getElementById('puzzle-slots');
+  const bankEl = document.getElementById('puzzle-bank');
+  const checkBtn = document.getElementById('puzzle-check');
+  const feedbackEl = document.getElementById('puzzle-feedback');
+
+  shuffled.forEach((word, i) => {
+    const el = document.createElement('div');
+    el.className = 'puzzle-word';
+    el.textContent = word;
+    el.dataset.word = word;
+    el.dataset.uid = 'w' + i;
+    bankEl.appendChild(el);
+    makeDraggable(el);
+  });
+
+  function updateState(){
+    slotsEl.classList.toggle('empty', slotsEl.children.length === 0);
+    checkBtn.disabled = bankEl.children.length !== 0;
+  }
+  updateState();
+
+  function makeDraggable(el){
+    let dragging = false;
+    let ghost = null;
+    let startX = 0, startY = 0;
+
+    function getDropTarget(x, y){
+      el.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(x, y);
+      el.style.pointerEvents = '';
+      if(!under) return null;
+      return under.closest('.puzzle-slots, .puzzle-bank');
+    }
+
+    function onMove(clientX, clientY){
+      if(!dragging) return;
+      ghost.style.left = (clientX - ghost.offsetWidth / 2) + 'px';
+      ghost.style.top = (clientY - ghost.offsetHeight / 2) + 'px';
+    }
+
+    function onEnd(clientX, clientY){
+      if(!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      ghost.remove();
+      ghost = null;
+
+      const dropZone = getDropTarget(clientX, clientY);
+      if(dropZone){
+        dropZone.appendChild(el);
+      }
+      feedbackEl.textContent = '';
+      feedbackEl.classList.remove('wrong');
+      updateState();
+
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+      document.removeEventListener('touchmove', touchMoveHandler);
+      document.removeEventListener('touchend', touchEndHandler);
+    }
+
+    function mouseMoveHandler(e){ onMove(e.clientX, e.clientY); }
+    function mouseUpHandler(e){ onEnd(e.clientX, e.clientY); }
+    function touchMoveHandler(e){
+      const t = e.touches[0];
+      onMove(t.clientX, t.clientY);
+      e.preventDefault();
+    }
+    function touchEndHandler(e){
+      const t = e.changedTouches[0];
+      onEnd(t.clientX, t.clientY);
+    }
+
+    function startDrag(clientX, clientY){
+      dragging = true;
+      startX = clientX; startY = clientY;
+      el.classList.add('dragging');
+
+      ghost = el.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      ghost.classList.remove('dragging');
+      ghost.style.width = el.offsetWidth + 'px';
+      document.body.appendChild(ghost);
+      onMove(clientX, clientY);
+    }
+
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      startDrag(e.clientX, e.clientY);
+      document.addEventListener('mousemove', mouseMoveHandler);
+      document.addEventListener('mouseup', mouseUpHandler);
+    });
+    el.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      startDrag(t.clientX, t.clientY);
+      document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+      document.addEventListener('touchend', touchEndHandler);
+    }, { passive: true });
+  }
+
+  checkBtn.addEventListener('click', () => {
+    const order = [...slotsEl.children].map(el => el.dataset.word);
+    if(order.join(' ') === target.join(' ')){
+      setTimeout(() => showPuzzleWin(data), 300);
+    } else {
+      feedbackEl.textContent = "Pas tout a fait... reessaie.";
+      feedbackEl.classList.add('wrong');
+    }
+  });
+}
+
+function showPuzzleWin(data){
+  const card = document.getElementById('content-card');
+  card.innerHTML = `
+    <div class="drag-handle"></div>
+    <div class="close-card" onclick="closeDay()">&times;</div>
+    <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.wordpuzzle}</div>
+    <div class="puzzle-win-text reveal" style="animation-delay:0.1s;">${data.winText}</div>
   `;
 }
 
