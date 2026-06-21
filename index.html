@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -265,28 +266,49 @@
     font-weight: 600;
     margin-bottom: 14px;
   }
+  .day-layout{
+    display:flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .day-text{
+    flex: 1.1;
+    min-width: 0;
+  }
+  .day-photos{
+    flex: 0.9;
+    min-width: 0;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  @media (max-width: 360px){
+    .day-layout{ flex-direction:column; }
+    .day-photos{ flex-direction:row; }
+  }
+
   .content-photo{
     width:100%;
-    aspect-ratio: 4/3;
+    aspect-ratio: 3/4;
     border-radius: 12px;
     background: var(--locked);
     display:flex; align-items:center; justify-content:center;
-    margin-bottom: 16px;
     color: #a39d90;
     font-size: 12px;
     overflow:hidden;
   }
   .content-photo img{ width:100%; height:100%; object-fit:cover; }
   .photo-caption{
-    font-size: 12px;
+    font-size: 11px;
     color: var(--ink-soft);
-    margin: -8px 0 16px;
+    margin: 6px 0 0;
     font-style: italic;
+    line-height: 1.4;
   }
   .content-text{
     font-family: var(--serif);
-    font-size: 17px;
-    line-height: 1.7;
+    font-size: 16px;
+    line-height: 1.65;
     color: var(--ink);
   }
   .content-text.placeholder{ color: var(--ink-soft); font-style: italic; font-family: var(--sans); font-size: 14px; }
@@ -475,7 +497,7 @@ function showDay(day){
       photosHtml = data.photos.map(p => {
         delay += step;
         return `
-        <div class="content-photo reveal" style="aspect-ratio:auto; animation-delay:${delay}s;">
+        <div class="content-photo reveal" style="animation-delay:${delay}s;">
           <img src="${p.src}" alt="">
         </div>
         ${p.caption ? `<p class="photo-caption reveal" style="animation-delay:${delay + 0.05}s;">${p.caption}</p>` : ''}
@@ -493,8 +515,12 @@ function showDay(day){
       <div class="drag-handle"></div>
       <div class="close-card" onclick="closeDay()">&times;</div>
       <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS[data.type] || 'Jour ' + day}</div>
-      ${photosHtml}
-      <div class="content-text ${isPlaceholder ? 'placeholder' : ''} reveal" style="animation-delay:${delay}s;">${data.text}</div>
+      <div class="day-layout">
+        <div class="day-text">
+          <div class="content-text ${isPlaceholder ? 'placeholder' : ''} reveal" style="animation-delay:${delay}s;">${data.text}</div>
+        </div>
+        ${photosHtml ? `<div class="day-photos">${photosHtml}</div>` : ''}
+      </div>
     `;
   }
 }
