@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -697,6 +693,649 @@
     font-size: 12px;
     color: var(--ink-soft);
   }
+
+  /* ---------- VELIB ---------- */
+  .velib-question{
+    margin-top: 22px;
+    padding: 18px;
+    background: var(--accent-soft);
+    border-radius: 14px;
+  }
+  .velib-q-text{
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .velib-btns{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .velib-btn{
+    padding: 11px 22px;
+    border-radius: 22px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .velib-yes{
+    background: var(--accent);
+    color: #fff;
+  }
+  .velib-no{
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .velib-answered{
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--accent);
+    text-align: center;
+    font-style: italic;
+  }
+  .velib-videos{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .velib-video-btn{
+    display: block;
+    text-align: center;
+    padding: 13px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+  }
+  /* ---------- WRAPPED (jour 14) ---------- */
+  .wrapped-shell{
+    position: relative;
+    background: #0d0d0d;
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrapped-progress-bar{
+    display: flex;
+    gap: 4px;
+    padding: 14px 16px 8px;
+    position: relative;
+    z-index: 10;
+  }
+  .wrapped-pb-seg{
+    flex: 1;
+    height: 2.5px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .wrapped-pb-seg .fill{
+    height: 100%;
+    background: #fff;
+    width: 0%;
+    transition: width 0.35s ease;
+  }
+  .wrapped-pb-seg.done .fill{ width: 100%; }
+  .wrapped-pb-seg.active .fill{ width: 100%; transition: none; }
+
+  /* horloge détaillée */
+  .w-clock-outer{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 6px 0;
+    max-height: 300px;
+    overflow: hidden;
+  }
+  .w-clock-svg-wrap{
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+  .w-clock-svg-wrap svg{ width:100%; height:100%; }
+  .w-clock-peaks{
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .w-clock-peaks.show{ opacity: 1; }
+  .w-peak-chip{
+    background: rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+    min-width: 56px;
+  }
+  .w-peak-chip.hot{ background: rgba(200,101,74,0.25); border: 1px solid rgba(200,101,74,0.5); }
+  .w-peak-chip .ph{ font-size: 11px; color: rgba(255,255,255,0.5); font-family:var(--sans); }
+  .w-peak-chip .pn{ font-size: 15px; font-weight: 800; color: #fff; font-family:var(--sans); font-variant-numeric: tabular-nums; }
+  .w-peak-chip.hot .pn{ color: #c8654a; }
+  .w-clock-day2{
+    opacity: 0;
+    transition: opacity 0.5s ease 0.3s;
+    background: rgba(200,101,74,0.2);
+    border: 1px solid rgba(200,101,74,0.5);
+    border-radius: 20px;
+    padding: 5px 14px;
+    color: #c8654a;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 auto;
+    display: inline-block;
+  }
+  .w-clock-day2.show{ opacity: 1; }
+
+  /* instagram DM reconstruction */
+  .w-ig-shell{
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .w-ig-topbar{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .w-ig-avatar{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .w-ig-name{
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--sans);
+  }
+  .w-ig-handle{
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    font-family: var(--sans);
+  }
+  .w-ig-msgs{
+    padding: 12px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 200px;
+  }
+  .w-ig-ts{
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    font-family: var(--sans);
+    margin: 4px 0;
+  }
+  .w-ig-msg{
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .w-ig-msg.show{ opacity: 1; transform: translateY(0); }
+  .w-ig-msg.right{ flex-direction: row-reverse; }
+  .w-ig-msg-av{
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f09433, #dc2743, #bc1888);
+    flex-shrink: 0;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .w-ig-bubble{
+    max-width: 78%;
+    padding: 9px 13px;
+    border-radius: 18px;
+    font-size: 12px;
+    line-height: 1.5;
+    font-family: var(--sans);
+  }
+  .w-ig-msg.left .w-ig-bubble{
+    background: #262626;
+    color: #fff;
+    border-bottom-left-radius: 4px;
+  }
+  .w-ig-msg.right .w-ig-bubble{
+    background: #3797f0;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .w-ig-after{
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 10px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .w-ig-after.show{ opacity: 1; }
+
+  /* mots — résumé final */
+  .w-words-grid{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .w-words-grid.show{ opacity: 1; }
+  .w-word-chip{
+    background: rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-family: var(--serif);
+    font-size: 20px;
+    color: #fff;
+  }
+
+  .wrapped-slide{
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 22px 28px;
+    text-align: center;
+    min-height: 460px;
+  }
+  .wrapped-slide.active{ display: flex; }
+
+  /* tap zones */
+  .wrapped-slide{
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px 24px;
+    text-align: center;
+    min-height: 460px;
+  }
+  .wrapped-slide.active{ display: flex; }
+  .wrapped-tap-prev{
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 38%;
+    z-index: 20;
+    cursor: pointer;
+  }
+  .wrapped-tap-next{
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 62%;
+    z-index: 20;
+    cursor: pointer;
+  }
+  .w-slide-eyebrow{
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 8px;
+    font-family: var(--sans);
+  }
+  .w-slide-title{
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+  /* fade-in utility */
+  .w-fade{
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .w-fade.show{ opacity: 1; transform: translateY(0); }
+  /* slide 1 intro */
+  .w-title-chars{
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    margin-bottom: 22px;
+    min-height: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+  .w-title-chars .char{
+    opacity: 0;
+    display: inline-block;
+    transition: opacity 0.05s ease;
+    white-space: pre;
+  }
+  .w-stat-row{
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .w-stat-row.show{ opacity: 1; transform: translateY(0); }
+  .w-stat-row strong{ color: #fff; font-size: 18px; font-weight: 700; }
+  .w-subtitle{
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    line-height: 1.6;
+    margin-top: 14px;
+    font-style: italic;
+    max-width: 280px;
+  }
+  .w-subtitle.show{ opacity: 1; }
+  /* slide 2 barres */
+  .w-bars-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .w-bar-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .w-bar-row.show{ opacity: 1; transform: translateX(0); }
+  .w-bar-label{
+    width: 28px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-align: right;
+    flex-shrink: 0;
+    font-family: var(--sans);
+  }
+  .w-bar-track{
+    flex: 1;
+    height: 26px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .w-bar-fill{
+    height: 100%;
+    border-radius: 6px;
+    width: 0%;
+    transition: width 0.7s cubic-bezier(.16,1,.3,1);
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    white-space: nowrap;
+    font-family: var(--sans);
+  }
+  .w-bar-row.jan .w-bar-fill{ background: #c8654a; }
+  .w-bar-row:not(.jan) .w-bar-fill{ background: rgba(200,101,74,0.4); }
+  .w-bar-caption{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .w-bar-caption.show{ opacity: 1; }
+  /* slide 3 bulles */
+  .w-bubbles{
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    justify-content: center;
+    margin: 12px 0;
+  }
+  .w-bubble-wrap{ display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .w-bubble{
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0);
+    transition: transform 0.6s cubic-bezier(.16,1,.3,1);
+  }
+  .w-bubble.pop{ transform: scale(1); }
+  .w-bubble.big{ width: 126px; height: 126px; background: rgba(200,101,74,0.35); border: 2px solid rgba(200,101,74,0.8); }
+  .w-bubble.small{ width: 104px; height: 104px; background: rgba(200,101,74,0.18); border: 2px solid rgba(200,101,74,0.4); }
+  .w-bubble .pct{ font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+  .w-bubble .msgs{ font-size: 9px; color: rgba(255,255,255,0.5); margin-top: 3px; font-family: var(--sans); }
+  .w-bubble-name{ font-size: 12px; color: rgba(255,255,255,0.5); font-style: italic; }
+  .w-taquin{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: rgba(255,255,255,0.65);
+    font-size: 13px;
+    font-style: italic;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .w-taquin.show{ opacity: 1; }
+  /* slide 4 mots */
+  .w-word-stage{
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    margin: 6px 0;
+  }
+  .w-big-word{
+    font-family: var(--serif);
+    font-size: 48px;
+    font-weight: 400;
+    color: #fff;
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(.16,1,.3,1);
+    white-space: nowrap;
+  }
+  .w-big-word.show{ opacity: 1; transform: scale(1); }
+  .w-big-word.hide{ opacity: 0; transform: scale(1.1); }
+  .w-word-counter{
+    color: rgba(255,255,255,0.25);
+    font-size: 11px;
+    font-family: var(--sans);
+    margin-top: 4px;
+  }
+  .w-words-grid{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .w-words-grid.show{ opacity: 1; }
+  .w-word-chip{
+    background: rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-family: var(--serif);
+    font-size: 18px;
+    color: #fff;
+  }
+  /* slide 5 humour */
+  .w-counters{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    margin: 8px 0;
+  }
+  .w-counter-item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .w-counter-item.show{ opacity: 1; transform: translateY(0); }
+  .w-counter-emoji{ font-size: 24px; flex-shrink: 0; width: 32px; text-align:center; }
+  .w-counter-num{
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    font-family: var(--sans);
+    min-width: 76px;
+    font-variant-numeric: tabular-nums;
+  }
+  .w-counter-label{ font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.4; text-align:left; }
+  .w-humour-detail{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    font-style: italic;
+    margin-top: 4px;
+    width: 100%;
+    line-height: 1.5;
+  }
+  .w-humour-detail.show{ opacity: 1; }
+  /* slide 7 habitudes */
+  .w-habits{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin: 6px 0;
+  }
+  .w-habit-line{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 9px 12px;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .w-habit-line.show{ opacity: 1; transform: translateX(0); }
+  .w-habit-icon{ font-size: 16px; flex-shrink: 0; width: 22px; text-align:center; }
+  .w-habit-phrase{ flex: 1; font-size: 12px; color: rgba(255,255,255,0.75); font-style: italic; text-align:left; }
+  .w-habit-count{ font-size: 15px; font-weight: 800; color: #c8654a; font-family:var(--sans); }
+  .w-habits-caption{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 4px;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+  .w-habits-caption.show{ opacity: 1; }
+  /* slide 8 dialecte */
+  .w-dialect-cloud{
+    position: relative;
+    width: 280px;
+    height: 190px;
+    margin: 4px auto;
+    flex-shrink: 0;
+  }
+  .w-dialect-word{
+    position: absolute;
+    color: rgba(255,255,255,0.9);
+    font-family: var(--serif);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    white-space: nowrap;
+  }
+  .w-dialect-word.show{ opacity: 1; }
+  .w-dialect-caption{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 8px;
+    max-width: 260px;
+    line-height: 1.5;
+  }
+  .w-dialect-caption.show{ opacity: 1; }
+  /* slide finale */
+  .w-final-stats{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin: 8px 0;
+  }
+  .w-final-line{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+  }
+  .w-final-line.show{ opacity: 1; transform: translateY(0); }
+  .w-final-line strong{ color: #fff; }
+  .w-final-sig{
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    color: rgba(255,255,255,0.5);
+    font-size: 18px;
+    font-family: var(--serif);
+    font-style: italic;
+    margin-top: 18px;
+    letter-spacing: 0.5px;
+  }
+  .w-final-sig.show{ opacity: 1; }
 </style>
 </head>
 <body>
@@ -837,6 +1476,28 @@ const CONTENT = {
     classifie: "En réalité, tu n'es pas ma cheffe. Enfin, si, un peu. Mais surtout tu es la personne à qui je réponds 🫡 parce que t'as toujours un peu raison, et que même quand t'as tort, j'ai pas envie de me bagarrer avec toi. Je t'aime, cheffe.",
     signataire: "Mathurin — Centurion (grade attribué le 9 juin 2026)"
   },
+  7: {
+    type: "velib",
+    text: "Ca fait 8 jours qu'on ne s'est pas vus...<br><br>Je pense aux bons moments, comme à cette belle sortie Vélib jusqu'à la Tour Eiffel. C'était trop bien, on devrait en refaire une.",
+    question: "T'as envie d'en refaire une ?",
+    videos: [
+      "https://youtube.com/shorts/g-MvcXRx-n8?feature=share",
+      "https://youtube.com/shorts/IPTO817HI-M?feature=share"
+    ]
+  },
+  14: {
+    type: "wrapped",
+    slides: [
+      { id: "intro" },
+      { id: "mois" },
+      { id: "qui" },
+      { id: "humour" },
+      { id: "horloge" },
+      { id: "habitudes" },
+      { id: "premier" },
+      { id: "finale" }
+    ]
+  },
   // ... continuer jusqu'a 46
   46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -849,7 +1510,9 @@ const TAG_LABELS = {
   photo: "Une photo",
   minigame: "Petit jeu",
   wordpuzzle: "Petit jeu",
-  rapport: "Rapport officiel"
+  rapport: "Rapport officiel",
+  velib: "Un souvenir",
+  wrapped: "Notre Wrapped"
 };
 
 /* ==================================================== */
@@ -962,6 +1625,28 @@ function showDay(day){
       <div class="reveal" style="animation-delay:0.1s;" id="rapport-root"></div>
     `;
     initRapport(data);
+  } else if(data.type === 'wrapped'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()" style="z-index:30;">&times;</div>
+      <div id="wrapped-root"></div>
+    `;
+    initWrapped(data);
+  } else if(data.type === 'velib'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS[data.type]}</div>
+      <div class="content-text reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div class="velib-question reveal" style="animation-delay:0.25s;">
+        <p class="velib-q-text">${data.question}</p>
+        <div class="velib-btns">
+          <button class="velib-btn velib-yes" onclick="velibReveal(${day})">Oui 🚲</button>
+          <button class="velib-btn velib-no" onclick="velibNo()">Pas encore</button>
+        </div>
+      </div>
+      <div id="velib-videos" class="velib-videos"></div>
+    `;
   } else {
     const isPlaceholder = data.text.startsWith('PLACEHOLDER');
     let photosHtml = '';
@@ -1340,6 +2025,509 @@ function initRapport(data){
   `;
 }
 
+/* ---------- VELIB REVEAL ---------- */
+function velibReveal(day){
+  const data = CONTENT[day];
+  const container = document.getElementById('velib-videos');
+  const btns = document.querySelector('.velib-btns');
+  btns.innerHTML = '<p class="velib-answered">Nous aussi 🚲❤️</p>';
+  container.innerHTML = data.videos.map((url, i) => `
+    <a href="${url}" target="_blank" class="velib-video-btn reveal" style="animation-delay:${i * 0.1}s;">
+      ▶ Voir la vidéo ${data.videos.length > 1 ? i + 1 : ''}
+    </a>
+  `).join('');
+}
+function velibNo(){
+  const btns = document.querySelector('.velib-btns');
+  btns.innerHTML = '<p class="velib-answered">Moi oui en tout cas 🚲</p>';
+}
+
+/* ---------- WRAPPED (jour 14) ---------- */
+function initWrapped(data){
+  const root = document.getElementById('wrapped-root');
+  const TOTAL = data.slides.length;
+  let current = 0;
+  let animating = false;
+  let wordInterval = null;
+
+  // Vraies données extraites des exports
+  const MOIS = [
+    { label:'Jan', n:31949, pct:100 },
+    { label:'Fév', n:25089, pct:79 },
+    { label:'Mar', n:17362, pct:54 },
+    { label:'Avr', n: 9498, pct:30 },
+    { label:'Mai', n: 9221, pct:29 },
+    { label:'Juin',n: 5074, pct:16 }
+  ];
+  // Heures snap + ig combinées
+  const HEURES = [4465,1307,93,4,23,215,833,1173,1440,1182,1968,3248,3345,2862,3778,3602,4150,6046,5705,4242,7873,14899,15930,9810];
+
+  const HABITS = [
+    { icon:'🌙', phrase:'"bonne nuit"',     count:232 },
+    { icon:'😴', phrase:'"dors bien"',      count:123 },
+    { icon:'☀️', phrase:'"bien dormi ?"',   count:106 },
+    { icon:'🫶', phrase:'"fais attention"', count:80  },
+    { icon:'❤️', phrase:'"je t\'aime"',     count:141 },
+    { icon:'💭', phrase:'"tu me manques"',  count:196 }
+  ];
+
+  // Premier vrai échange Snap du 9 janvier
+  const CONV = [
+    { side:'left',  text:'Salut mathurin,\ndésolé de te déranger juste j\'ai appris que tu savais pour ce qu\'il s\'est passé entre Andreas et moi ça me dérange pas du tout mais stp évite de le raconter à des personnes prcq y\'a pas grand monde au courant et j\'ai vrmt honte de ce qu\'il raconte sur moi ( en plus c\'est faux) je veux pas que tout le monde pense ça de moi' },
+    { side:'right', text:'Oui salut, je suis désolé on m\'a dit que j\'avais trop pt ma bouche mais j\'en suis vrm désolé je voulais vrm pas être méchant. En tous cas ça a été mon ami a un moment mais il avait déjà fait des trucs avant et la ce qu\'il t\'a fait vrm un truc d\'enculé. Donc vrm jspr que ça va parce que faut vrm pas écouter ce qu\'il dit. Encore désolé si je t\'ai causé du tort.\nGrosse force a toi' },
+    { side:'left',  text:'Vraiment t\'inquiète pas je sais que c\'était pas pour être méchant et que c\'est parce que toi aussi tu l\'aime pas. Vrmt tktp mais juste j\'ai tellement honte même si c\'est faux si tout le monde le sait tout le monde va penser ça de moi.' },
+  ];
+
+  root.innerHTML = `
+    <div class="wrapped-shell" id="w-shell">
+      <div class="wrapped-progress-bar" id="w-pb"></div>
+      <div id="w-slides-area" style="position:relative;flex:1;display:flex;flex-direction:column;">
+        ${buildSlides()}
+      </div>
+      <div class="wrapped-tap-prev" id="w-tap-prev"></div>
+      <div class="wrapped-tap-next" id="w-tap-next"></div>
+    </div>
+  `;
+
+  buildProgressBar();
+  showSlide(0);
+  document.getElementById('w-tap-next').addEventListener('click', next);
+  document.getElementById('w-tap-prev').addEventListener('click', prev);
+
+  function buildProgressBar(){
+    const pb = document.getElementById('w-pb');
+    pb.innerHTML = '';
+    for(let i = 0; i < TOTAL; i++){
+      const seg = document.createElement('div');
+      seg.className = 'wrapped-pb-seg';
+      seg.id = 'w-seg-'+i;
+      seg.innerHTML = '<div class="fill"></div>';
+      pb.appendChild(seg);
+    }
+  }
+
+  function updateProgressBar(idx){
+    for(let i = 0; i < TOTAL; i++){
+      const seg = document.getElementById('w-seg-'+i);
+      seg.className = 'wrapped-pb-seg';
+      if(i < idx) seg.classList.add('done');
+      else if(i === idx) seg.classList.add('active');
+    }
+  }
+
+  function next(){
+    if(animating) return;
+    if(current < TOTAL - 1){ current++; showSlide(current); }
+  }
+  function prev(){
+    if(animating) return;
+    if(current > 0){ current--; showSlide(current); }
+  }
+
+  function showSlide(idx){
+    if(wordInterval){ clearInterval(wordInterval); wordInterval = null; }
+    document.querySelectorAll('.wrapped-slide').forEach(s => s.classList.remove('active'));
+    const slide = document.getElementById('w-slide-'+idx);
+    if(slide) slide.classList.add('active');
+    updateProgressBar(idx);
+    animating = true;
+    setTimeout(() => { animating = false; }, 400);
+    runSlideAnim(idx);
+  }
+
+  function runSlideAnim(idx){
+    const id = data.slides[idx].id;
+    if(id === 'intro')      animIntro();
+    else if(id === 'mois')  animMois();
+    else if(id === 'qui')   animQui();
+    else if(id === 'humour') animHumour();
+    else if(id === 'horloge') animHorloge();
+    else if(id === 'habitudes') animHabitudes();
+    else if(id === 'premier') animPremier();
+    else if(id === 'finale') animFinale();
+  }
+
+  /* ---- BUILD SLIDES HTML ---- */
+  function buildSlides(){
+    return [
+      buildIntro(), buildMois(), buildQui(),
+      buildHumour(), buildHorloge(), buildHabitudes(),
+      buildPremier(), buildFinale()
+    ].map((html, i) => `<div class="wrapped-slide" id="w-slide-${i}">${html}</div>`).join('');
+  }
+
+  function buildIntro(){
+    return `
+      <div class="w-title-chars" id="w-intro-title"></div>
+      <div class="w-stat-row" id="w-stat-0"><span>💬</span><strong id="w-msgs-num">0</strong><span>messages</span></div>
+      <div class="w-stat-row" id="w-stat-1"><span>📱</span><strong>2</strong><span>plateformes</span></div>
+      <div class="w-stat-row" id="w-stat-2"><span>📅</span><strong>du 9 jan au 20 juin</strong></div>
+      <div class="w-subtitle" id="w-intro-sub">163 jours. Une histoire qui se compte en dizaines de milliers de mots.</div>
+    `;
+  }
+
+  function buildMois(){
+    const rows = MOIS.map((m,i) => `
+      <div class="w-bar-row ${i===0?'jan':''}" id="w-bar-${i}">
+        <div class="w-bar-label">${m.label}</div>
+        <div class="w-bar-track"><div class="w-bar-fill" id="w-bfill-${i}" data-pct="${m.pct}" data-n="${m.n.toLocaleString('fr-FR')}"></div></div>
+      </div>
+    `).join('');
+    return `
+      <div class="w-slide-eyebrow">Mois par mois</div>
+      <div class="w-bars-container">${rows}</div>
+      <div class="w-bar-caption" id="w-bar-cap">Janvier. Le tout début. Je n'arrêtais pas de t'écrire.</div>
+    `;
+  }
+
+  function buildQui(){
+    return `
+      <div class="w-slide-eyebrow">Qui a le plus parlé ?</div>
+      <div class="w-bubbles">
+        <div class="w-bubble-wrap">
+          <div class="w-bubble big" id="w-bub-azi">
+            <span class="pct">53%</span>
+            <span class="msgs">42 946 msgs</span>
+          </div>
+          <div class="w-bubble-name">Aziyadé</div>
+        </div>
+        <div class="w-bubble-wrap">
+          <div class="w-bubble small" id="w-bub-mat">
+            <span class="pct">47%</span>
+            <span class="msgs">37 590 msgs</span>
+          </div>
+          <div class="w-bubble-name">Mathurin</div>
+        </div>
+      </div>
+      <div class="w-taquin" id="w-taquin">C'est toi qui parles le plus.<br>Je le savais. 😌</div>
+    `;
+  }
+
+  function buildHumour(){
+    return `
+      <div class="w-slide-eyebrow">Notre humour</div>
+      <div class="w-counters">
+        <div class="w-counter-item" id="w-cnt-0">
+          <div class="w-counter-emoji">🤣</div>
+          <div class="w-counter-num" id="w-cnt-num-0">0</div>
+          <div class="w-counter-label">fois au total<br><span style="color:rgba(255,255,255,0.3);font-size:10px;">toi 18 193 · moi 12 292</span></div>
+        </div>
+        <div class="w-counter-item" id="w-cnt-1">
+          <div class="w-counter-emoji">💬</div>
+          <div class="w-counter-num" id="w-cnt-num-1">0</div>
+          <div class="w-counter-label">"mdr / mdrr / mdrrr"</div>
+        </div>
+        <div class="w-counter-item" id="w-cnt-2">
+          <div class="w-counter-emoji">😇</div>
+          <div class="w-counter-num" id="w-cnt-num-2">0</div>
+          <div class="w-counter-label">fois cet emoji</div>
+        </div>
+      </div>
+      <div class="w-humour-detail" id="w-humour-detail">Tu envoies 🤣 18 193 fois. Moi 12 292. Tu gagnes.</div>
+    `;
+  }
+
+  function buildHorloge(){
+    // SVG horloge polaire avec vraies données
+    const cx = 110, cy = 110, r0 = 58;
+    const maxVal = Math.max(...HEURES);
+    let ticks = '';
+    let labels = '';
+    for(let h = 0; h < 24; h++){
+      const angle = (h / 24) * 2 * Math.PI - Math.PI / 2;
+      const barLen = (HEURES[h] / maxVal) * 44;
+      const x0 = cx + r0 * Math.cos(angle);
+      const y0 = cy + r0 * Math.sin(angle);
+      const x1 = cx + (r0 + barLen) * Math.cos(angle);
+      const y1 = cy + (r0 + barLen) * Math.sin(angle);
+      const isHot = h === 21 || h === 22 || h === 23;
+      const isPeak = h === 22;
+      const color = isPeak ? '#c8654a' : isHot ? 'rgba(200,101,74,0.55)' : 'rgba(255,255,255,0.2)';
+      const sw = isPeak ? 4 : isHot ? 2.5 : 1.5;
+      ticks += `<line id="w-tick-${h}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" opacity="0"/>`;
+    }
+    // étiquettes heures clés
+    for(const h of [0,6,12,18,22]){
+      const angle = (h / 24) * 2 * Math.PI - Math.PI / 2;
+      const rl = 46;
+      const x = cx + rl * Math.cos(angle);
+      const y = cy + rl * Math.sin(angle);
+      labels += `<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" fill="rgba(255,255,255,0.3)" font-size="8" text-anchor="middle" font-family="sans-serif">${h}h</text>`;
+    }
+
+    // Top 4 heures pour les chips
+    const top4 = [...HEURES.entries()].sort((a,b) => b[1]-a[1]).slice(0,4);
+    const chips = top4.map(([h,n]) => `
+      <div class="w-peak-chip ${h===22?'hot':''}">
+        <div class="ph">${h}h–${h+1}h</div>
+        <div class="pn">${n.toLocaleString('fr-FR')}</div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="w-slide-eyebrow">À quelle heure on s'écrivait ?</div>
+      <div class="w-clock-outer">
+        <div class="w-clock-svg-wrap">
+          <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="${cx}" cy="${cy}" r="${r0}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <circle cx="${cx}" cy="${cy}" r="${r0-14}" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            ${ticks}
+            ${labels}
+            <circle cx="${cx}" cy="${cy}" r="3.5" fill="rgba(255,255,255,0.4)"/>
+          </svg>
+        </div>
+        <div class="w-clock-peaks" id="w-clock-peaks">${chips}</div>
+      </div>
+      <div class="w-clock-day2" id="w-clock-day2">☀️ Jour le plus actif : le dimanche — 18 851 msgs</div>
+    `;
+  }
+
+  function buildHabitudes(){
+    const rows = HABITS.map((h,i) => `
+      <div class="w-habit-line" id="w-habit-${i}">
+        <span class="w-habit-icon">${h.icon}</span>
+        <span class="w-habit-phrase">${h.phrase}</span>
+        <span class="w-habit-count">${h.count}×</span>
+      </div>
+    `).join('');
+    return `
+      <div class="w-slide-eyebrow">Ce qu'on s'est dit le plus</div>
+      <div class="w-slide-title" style="font-size:16px;margin-bottom:10px;">Les mots qu'on répète<br>sans s'en rendre compte</div>
+      <div class="w-habits">${rows}</div>
+      <div class="w-habits-caption" id="w-habits-cap">Ce sont souvent les mots les plus importants.</div>
+    `;
+  }
+
+  function buildPremier(){
+    return `
+      <div class="w-ig-shell" id="w-ig-shell" style="width:100%;opacity:0;transition:opacity 0.6s ease;">
+        <div class="w-ig-topbar">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="w-ig-avatar" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fff;font-weight:700;">A</div>
+            <div>
+              <div class="w-ig-name" style="font-size:13px;font-weight:700;color:#fff;">Aziyadé ❤️❤️</div>
+              <div class="w-ig-handle" style="font-size:11px;color:rgba(255,255,255,0.4);">aziyade_gb</div>
+            </div>
+          </div>
+        </div>
+        <div class="w-ig-msgs" id="w-ig-msgs" style="padding:10px 12px 14px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:360px;">
+          <div class="w-ig-ts" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.28);font-family:var(--sans);margin:6px 0 10px;letter-spacing:0.3px;">9 JANV. 2026 · 22:20</div>
+        </div>
+      </div>
+      <div class="w-ig-after" id="w-ig-after" style="opacity:0;transition:opacity 0.8s ease;color:rgba(255,255,255,0.4);font-size:12px;font-style:italic;margin-top:12px;text-align:center;line-height:1.6;">Et voilà comment tout a commencé.<br>Un inconnu. Un message. Une vie qui change.</div>
+    `;
+  }
+
+  function buildFinale(){
+    const lines = [
+      { icon:'💬', txt:'<strong>98 193</strong> messages au total' },
+      { icon:'📅', txt:'du <strong>9 janvier</strong> au <strong>20 juin 2026</strong>' },
+      { icon:'🌙', txt:'pic à <strong>22h</strong> chaque soir' },
+      { icon:'🤣', txt:'<strong>30 485</strong> fois le même emoji' },
+      { icon:'❤️', txt:'<strong>141</strong> "je t\'aime"' },
+      { icon:'💭', txt:'<strong>196</strong> fois "tu me manques"' },
+    ];
+    return `
+      <div class="w-final-stats">
+        ${lines.map((l,i) => `<div class="w-final-line" id="w-fl-${i}"><span style="font-size:17px;">${l.icon}</span><span>${l.txt}</span></div>`).join('')}
+      </div>
+      <div class="w-final-sig" id="w-final-sig">— Mathurin 🫡</div>
+    `;
+  }
+
+  /* ---- ANIMATIONS ---- */
+  function animIntro(){
+    const titleEl = document.getElementById('w-intro-title');
+    if(!titleEl) return;
+    const text = "Notre 2026 Wrapped";
+    titleEl.innerHTML = text.split('').map((c,i) =>
+      `<span class="char" style="transition-delay:${i*50}ms">${c === ' ' ? '&nbsp;' : c}</span>`
+    ).join('');
+    setTimeout(() => titleEl.querySelectorAll('.char').forEach(c => c.style.opacity = '1'), 80);
+    const base = text.length * 50 + 150;
+    ['w-stat-0','w-stat-1','w-stat-2'].forEach((id,i) => {
+      setTimeout(() => { const el = document.getElementById(id); if(el) el.classList.add('show'); }, base + i*300);
+    });
+    const msgsEl = document.getElementById('w-msgs-num');
+    if(msgsEl) setTimeout(() => animCount(msgsEl, 98193, 1000), base);
+    setTimeout(() => { const s = document.getElementById('w-intro-sub'); if(s) s.classList.add('show'); }, base + 1100);
+  }
+
+  function animMois(){
+    MOIS.forEach((m,i) => {
+      setTimeout(() => {
+        const row = document.getElementById('w-bar-'+i);
+        if(row) row.classList.add('show');
+        setTimeout(() => {
+          const fill = document.getElementById('w-bfill-'+i);
+          if(fill){ fill.style.width = m.pct+'%'; fill.textContent = m.n.toLocaleString('fr-FR'); }
+        }, 60);
+      }, i * 150);
+    });
+    setTimeout(() => { const c = document.getElementById('w-bar-cap'); if(c) c.classList.add('show'); }, MOIS.length*150+300);
+  }
+
+  function animQui(){
+    setTimeout(() => { const a = document.getElementById('w-bub-azi'); if(a) a.classList.add('pop'); }, 200);
+    setTimeout(() => { const m = document.getElementById('w-bub-mat'); if(m) m.classList.add('pop'); }, 500);
+    setTimeout(() => { const t = document.getElementById('w-taquin'); if(t) t.classList.add('show'); }, 1000);
+  }
+
+  function animHumour(){
+    const targets = [30485, 2158, 3607];
+    ['w-cnt-0','w-cnt-1','w-cnt-2'].forEach((id,i) => {
+      setTimeout(() => {
+        const item = document.getElementById(id);
+        if(item) item.classList.add('show');
+        const numEl = document.getElementById('w-cnt-num-'+i);
+        if(numEl) animCount(numEl, targets[i], 900);
+      }, i * 350);
+    });
+    setTimeout(() => { const d = document.getElementById('w-humour-detail'); if(d) d.classList.add('show'); }, 3*350+950);
+  }
+
+  function animHorloge(){
+    // Allume les ticks un par un, accélère vers 22h
+    for(let h = 0; h < 24; h++){
+      const delay = h * 50;
+      setTimeout(() => {
+        const tick = document.getElementById('w-tick-'+h);
+        if(tick) tick.setAttribute('opacity','1');
+      }, delay);
+    }
+    setTimeout(() => { const p = document.getElementById('w-clock-peaks'); if(p) p.classList.add('show'); }, 24*50+200);
+    setTimeout(() => { const d = document.getElementById('w-clock-day2'); if(d) d.classList.add('show'); }, 24*50+500);
+  }
+
+  function animHabitudes(){
+    HABITS.forEach((_,i) => {
+      setTimeout(() => { const el = document.getElementById('w-habit-'+i); if(el) el.classList.add('show'); }, i*120);
+    });
+    setTimeout(() => { const c = document.getElementById('w-habits-cap'); if(c) c.classList.add('show'); }, HABITS.length*120+200);
+  }
+
+  function animPremier(){
+    const shell = document.getElementById('w-ig-shell');
+    const msgs = document.getElementById('w-ig-msgs');
+    const after = document.getElementById('w-ig-after');
+    if(!shell || !msgs) return;
+
+    // Styles pour bulles et typing injectés dynamiquement
+    if(!document.getElementById('ig-anim-style')){
+      const s = document.createElement('style');
+      s.id = 'ig-anim-style';
+      s.textContent = `
+        .ig-msg-wrap { display:flex; align-items:flex-end; gap:7px; margin:2px 0; opacity:0; transform:translateY(10px); transition:opacity 0.35s ease, transform 0.35s ease; }
+        .ig-msg-wrap.left { flex-direction:row; }
+        .ig-msg-wrap.right { flex-direction:row-reverse; }
+        .ig-msg-wrap.visible { opacity:1; transform:translateY(0); }
+        .ig-av { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#f09433,#dc2743,#bc1888); flex-shrink:0; font-size:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+        .ig-av.hidden { visibility:hidden; }
+        .ig-bub { max-width:82%; padding:10px 13px; border-radius:20px; font-size:11.5px; line-height:1.55; font-family:var(--sans); word-break:break-word; }
+        .ig-bub.left { background:#262626; color:#fff; border-bottom-left-radius:4px; }
+        .ig-bub.right { background:#3797f0; color:#fff; border-bottom-right-radius:4px; }
+        .ig-typing { display:flex; align-items:center; gap:7px; padding:2px 0; opacity:0; transition:opacity 0.3s ease; }
+        .ig-typing.left { flex-direction:row; }
+        .ig-typing.right { flex-direction:row-reverse; }
+        .ig-typing .ig-av-t { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#f09433,#dc2743,#bc1888); flex-shrink:0; font-size:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+        .ig-typing-bub { background:#262626; border-radius:20px; border-bottom-left-radius:4px; padding:10px 14px; display:flex; gap:5px; align-items:center; }
+        .ig-typing-bub.right-t { background:#2d6fb0; border-bottom-left-radius:20px; border-bottom-right-radius:4px; }
+        .ig-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.5); animation:igdot 1.2s infinite ease-in-out; }
+        .ig-dot:nth-child(2) { animation-delay:0.2s; }
+        .ig-dot:nth-child(3) { animation-delay:0.4s; }
+        @keyframes igdot { 0%,60%,100%{transform:translateY(0);opacity:0.4;} 30%{transform:translateY(-5px);opacity:1;} }
+        .ig-seen { text-align:right; font-size:9.5px; color:rgba(255,255,255,0.25); padding:0 4px 4px; font-family:var(--sans); opacity:0; transition:opacity 0.4s ease; }
+        .ig-seen.show { opacity:1; }
+      `;
+      document.head.appendChild(s);
+    }
+
+    // Fade in shell
+    setTimeout(() => { shell.style.opacity = '1'; }, 100);
+
+    const sequence = [
+      { side:'left',  delay:600,  typingMs:2200, text:'Salut mathurin,\ndésolé de te déranger juste j\'ai appris que tu savais pour ce qu\'il s\'est passé entre Andreas et moi ça me dérange pas du tout mais stp évite de le raconter à des personnes prcq y\'a pas grand monde au courant et j\'ai vrmt honte de ce qu\'il raconte sur moi ( en plus c\'est faux) je veux pas que tout le monde pense ça de moi', showAv:true },
+      { side:'right', delay:800,  typingMs:2800, text:'Oui salut, je suis désolé on m\'a dit que j\'avais trop pt ma bouche mais j\'en suis vrm désolé je voulais vrm pas être méchant. En tous cas ça a été mon ami a un moment mais il avait déjà fait des trucs avant et la ce qu\'il t\'a fait vrm un truc d\'enculé. Donc vrm jspr que ça va parce que faut vrm pas écouter ce qu\'il dit. Encore désolé si je t\'ai causé du tort.\nGrosse force a toi', showAv:false },
+      { side:'left',  delay:700,  typingMs:1800, text:'Vraiment t\'inquiète pas je sais que c\'était pas pour être méchant et que c\'est parce que toi aussi tu l\'aime pas. Vrmt tktp mais juste j\'ai tellement honte même si c\'est faux si tout le monde le sait tout le monde va penser ça de moi.', showAv:true },
+    ];
+
+    let cursor = 0;
+
+    function showNext(){
+      if(cursor >= sequence.length){
+        // "Lu" sous le dernier msg
+        const seen = document.createElement('div');
+        seen.className = 'ig-seen';
+        seen.textContent = 'Lu · 22:31';
+        msgs.appendChild(seen);
+        setTimeout(() => seen.classList.add('show'), 200);
+        setTimeout(() => { if(after) after.style.opacity = '1'; }, 900);
+        return;
+      }
+      const item = sequence[cursor++];
+
+      // Typing indicator
+      const typingRow = document.createElement('div');
+      typingRow.className = 'ig-typing ' + item.side;
+      typingRow.innerHTML = `
+        ${item.side === 'left' ? '<div class="ig-av-t">A</div>' : ''}
+        <div class="ig-typing-bub ${item.side === 'right' ? 'right-t' : ''}">
+          <div class="ig-dot"></div><div class="ig-dot"></div><div class="ig-dot"></div>
+        </div>
+      `;
+      msgs.appendChild(typingRow);
+      msgs.scrollTop = msgs.scrollHeight;
+
+      setTimeout(() => { typingRow.style.opacity = '1'; }, 60);
+
+      // Après typingMs → remplace par vrai message
+      setTimeout(() => {
+        typingRow.remove();
+
+        const wrap = document.createElement('div');
+        wrap.className = 'ig-msg-wrap ' + item.side;
+
+        const avHtml = item.side === 'left'
+          ? `<div class="ig-av ${item.showAv ? '' : 'hidden'}">A</div>`
+          : '';
+
+        wrap.innerHTML = `
+          ${avHtml}
+          <div class="ig-bub ${item.side}">${item.text.replace(/\n/g,'<br>')}</div>
+        `;
+        msgs.appendChild(wrap);
+        msgs.scrollTop = msgs.scrollHeight;
+
+        setTimeout(() => { wrap.classList.add('visible'); msgs.scrollTop = msgs.scrollHeight; }, 40);
+
+        // Pause avant prochain message
+        setTimeout(showNext, item.delay + 300);
+      }, item.typingMs);
+    }
+
+    setTimeout(showNext, sequence[0].delay);
+  }
+
+  function animFinale(){
+    for(let i = 0; i < 6; i++){
+      setTimeout(() => { const el = document.getElementById('w-fl-'+i); if(el) el.classList.add('show'); }, i*260);
+    }
+    setTimeout(() => { const s = document.getElementById('w-final-sig'); if(s) s.classList.add('show'); }, 6*260+500);
+  }
+
+  function animCount(el, target, duration){
+    const start = performance.now();
+    function step(now){
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(ease * target).toLocaleString('fr-FR');
+      if(t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+}
+
+
 function closeDay(){
   const panel = document.getElementById('content-panel');
   panel.classList.remove('visible');
@@ -1358,6 +2546,23 @@ document.addEventListener('keydown', function(e){
     closeDay();
   }
 });
+
+document.getElementById('pwd-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const val = document.getElementById('pwd-input').value.trim();
+  const errorEl = document.getElementById('pwd-error');
+
+  if(val === PASSWORD){
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    buildGrid();
+  } else {
+    errorEl.textContent = "Ce n'est pas la bonne date...";
+    document.getElementById('pwd-input').value = '';
+  }
+});
+
+
 
 document.getElementById('pwd-form').addEventListener('submit', function(e){
   e.preventDefault();
