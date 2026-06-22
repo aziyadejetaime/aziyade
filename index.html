@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -515,6 +516,181 @@
     font-size: 14px;
   }
 
+  /* ---------- RAPPORT OFFICIEL MILITAIRE (jour 5) ---------- */
+  .rapport-doc{
+    background: #0f1a10;
+    border-radius: 10px;
+    padding: 18px 16px 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11.5px;
+    color: #b8c9a3;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .rapport-topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #2e4a20;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .rapport-logo{
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #5a7a45;
+    line-height: 1.8;
+  }
+  .rapport-logo b{ color: #8ab870; display: block; font-size: 11px; }
+  .rapport-stamp{
+    border: 2px solid #c0392b;
+    color: #c0392b;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    transform: rotate(-8deg);
+    line-height: 1.4;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .rapport-ref-block{
+    border: 1px solid #2e4a20;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    background: #091209;
+  }
+  .rapport-ref-row{
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #5a7a45;
+    margin-bottom: 2px;
+  }
+  .rapport-ref-row span{ color: #8ab870; }
+  .rapport-objet{
+    color: #d4e8b8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-left: 3px solid #5a7a45;
+    padding: 6px 10px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .rapport-section{ margin-bottom: 14px; }
+  .rapport-section-title{
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #5a7a45;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rapport-section-title::before{
+    content: '▸';
+    color: #8ab870;
+  }
+  .rapport-section-title::after{
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2e4a20;
+  }
+  .rapport-p{
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: #b8c9a3;
+    margin-bottom: 6px;
+  }
+  .rapport-preuve{
+    display: inline;
+    color: #8ab870;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .rapport-preuve:hover{ color: #d4e8b8; }
+  .rapport-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+    margin-bottom: 10px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .rapport-table th{
+    background: #1a2e12;
+    font-weight: 700;
+    text-align: left;
+    padding: 5px 7px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #5a7a45;
+    border: 1px solid #2e4a20;
+  }
+  .rapport-table td{
+    padding: 5px 7px;
+    border: 1px solid #1e3015;
+    color: #b8c9a3;
+  }
+  .rapport-table .num{ text-align: right; font-variant-numeric: tabular-nums; }
+  .rapport-table .highlight td{
+    background: #1a2e12;
+    color: #d4e8b8;
+    font-weight: 700;
+  }
+  .rapport-table .highlight td.num{ color: #8ab870; }
+  .rapport-classified{
+    background: #091209;
+    border: 1px solid #c0392b;
+    padding: 12px 14px;
+    border-radius: 4px;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #d4e8b8;
+    font-style: italic;
+    margin-top: 4px;
+    position: relative;
+  }
+  .rapport-classified-label{
+    font-family: 'Courier New', Courier, monospace;
+    font-style: normal;
+    font-size: 8.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c0392b;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rapport-classified-label::after{
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #c0392b;
+    opacity: 0.4;
+  }
+  .rapport-sig{
+    margin-top: 14px;
+    text-align: right;
+    font-size: 10px;
+    color: #5a7a45;
+    border-top: 1px solid #2e4a20;
+    padding-top: 10px;
+    font-style: italic;
+  }
+  .rapport-sig b{ color: #8ab870; font-style: normal; }
+
   footer{
     text-align:center;
     margin-top: 32px;
@@ -627,6 +803,40 @@ const CONTENT = {
     words: ["Tu", "es", "rayonnante,", "ne", "change", "jamais,", "je", "t'aime."],
     winText: "Tu es rayonnante, ne change jamais, je t'aime."
   },
+  5: {
+    type: "rapport",
+    ref: "RAP-2026-05-CF",
+    objet: "Analyse comparative de l'utilisation du grade Chef/Cheffe entre les sujets Mathurin et Aziyadé",
+    stats: [
+      { plateforme: "Instagram", sujet: "Mathurin",  chef: 1,  cheffe: 11, salut: 41, total: 53 },
+      { plateforme: "Instagram", sujet: "Aziyadé",   chef: 2,  cheffe: 2,  salut: 14, total: 18 },
+      { plateforme: "Snapchat",  sujet: "Mathurin",  chef: 4,  cheffe: 9,  salut: 46, total: 59 },
+      { plateforme: "Snapchat",  sujet: "Aziyadé",   chef: 9,  cheffe: 3,  salut: 25, total: 37 },
+      { plateforme: "TOTAL",     sujet: "Mathurin",  chef: 5,  cheffe: 20, salut: 87, total: 112, isTotal: true },
+      { plateforme: "TOTAL",     sujet: "Aziyadé",   chef: 11, cheffe: 5,  salut: 39, total: 55,  isTotal: true }
+    ],
+    sections: [
+      {
+        titre: "I. Contexte et périmètre de l'étude",
+        contenu: "La présente analyse porte sur l'ensemble des échanges numériques entre les sujets Mathurin (ci-après « l'Administré ») et Aziyadé (ci-après « la Supérieure Hiérarchique ») sur les plateformes Instagram et Snapchat, sur la période janvier–juin 2026. L'objet de l'étude est de quantifier l'utilisation du trigramme Chef/Cheffe/🫡, indicateur reconnu d'allégeance dans les relations contemporaines."
+      },
+      {
+        titre: "II. Analyse des données brutes",
+        tableau: true,
+        contenu: "Les données collectées révèlent un déséquilibre statistiquement significatif : le sujet Mathurin a émis 112 occurrences du trigramme, contre 55 pour le sujet Aziyadé — soit un ratio de 2,04. Il est notamment observé que le 🫡 représente 77,6 % des émissions de Mathurin (87/112), ce qui témoigne d'un recours massif au salut militaire comme mécanisme d'obéissance différée."
+      },
+      {
+        titre: "III. Incident documenté du 9 juin 2026",
+        contenu: "Le 9 juin 2026, le sujet Aziyadé a tenté d'institutionnaliser la dynamique Chef/Cheffe en proposant une réorganisation hiérarchique à l'antique. Verbatim : « Bah déjà si je suis la cheffe comme tu le dis tt le temps, il faut des sous-officiers. » Le sujet Mathurin a alors invoqué le droit romain (« On est à Rome zhema »), avant de se voir officiellement attribuer le grade de Centurion par décret oral. Ce grade n'a depuis jamais été contesté. [PREUVE]",
+        preuve: {
+          src: "images/centurion.jpg",
+          caption: "Pièce n°1 — Décret oral du 9 juin 2026. Attribution du grade de Centurion à Mathurin."
+        }
+      }
+    ],
+    classifie: "En réalité, tu n'es pas ma cheffe. Enfin, si, un peu. Mais surtout tu es la personne à qui je réponds 🫡 parce que t'as toujours un peu raison, et que même quand t'as tort, j'ai pas envie de me bagarrer avec toi. Je t'aime, cheffe.",
+    signataire: "Mathurin — Centurion (grade attribué le 9 juin 2026)"
+  },
   // ... continuer jusqu'a 46
   46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -638,7 +848,8 @@ const TAG_LABELS = {
   challenge: "Defi du jour",
   photo: "Une photo",
   minigame: "Petit jeu",
-  wordpuzzle: "Petit jeu"
+  wordpuzzle: "Petit jeu",
+  rapport: "Rapport officiel"
 };
 
 /* ==================================================== */
@@ -743,6 +954,14 @@ function showDay(day){
       <div id="puzzle-root"></div>
     `;
     initWordPuzzle(data);
+  } else if(data.type === 'rapport'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.rapport}</div>
+      <div class="reveal" style="animation-delay:0.1s;" id="rapport-root"></div>
+    `;
+    initRapport(data);
   } else {
     const isPlaceholder = data.text.startsWith('PLACEHOLDER');
     let photosHtml = '';
@@ -1033,6 +1252,91 @@ function showPuzzleWin(data){
     <div class="close-card" onclick="closeDay()">&times;</div>
     <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.wordpuzzle}</div>
     <div class="puzzle-win-text reveal" style="animation-delay:0.1s;">${data.winText}</div>
+  `;
+}
+
+/* ---------- RAPPORT OFFICIEL ---------- */
+function initRapport(data){
+  const root = document.getElementById('rapport-root');
+
+  const tableauHtml = `
+    <table class="rapport-table">
+      <thead>
+        <tr>
+          <th>Plateforme</th>
+          <th>Sujet</th>
+          <th class="num">Chef</th>
+          <th class="num">Cheffe</th>
+          <th class="num">🫡</th>
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.stats.map(r => `
+          <tr class="${r.isTotal ? 'highlight' : ''}">
+            <td>${r.plateforme}</td>
+            <td>${r.sujet}</td>
+            <td class="num">${r.chef}</td>
+            <td class="num">${r.cheffe}</td>
+            <td class="num">${r.salut}</td>
+            <td class="num">${r.total}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  const sectionsHtml = data.sections.map(s => {
+    let contenu = s.contenu;
+    if(s.preuve){
+      contenu = contenu.replace(
+        '[PREUVE]',
+        `<span class="rapport-preuve lightbox-trigger" data-src="${escapeAttr(s.preuve.src)}" data-caption="${escapeAttr(s.preuve.caption)}">[voir preuve]</span>`
+      );
+    }
+    return `
+      <div class="rapport-section">
+        <div class="rapport-section-title">${s.titre}</div>
+        ${s.tableau ? tableauHtml : ''}
+        <p class="rapport-p">${contenu}</p>
+      </div>
+    `;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="rapport-doc">
+      <div class="rapport-topbar">
+        <div class="rapport-logo">
+          <b>D.A.S.</b>
+          Département des Affaires Sentimentales<br>
+          Division Renseignement & Analyse
+        </div>
+        <div class="rapport-stamp">TOP<br>SECRET<br>❤</div>
+      </div>
+
+      <div class="rapport-ref-block">
+        <div class="rapport-ref-row">RÉFÉRENCE <span>${data.ref}</span></div>
+        <div class="rapport-ref-row">DATE D'ÉMISSION <span>08 JUILLET 2026</span></div>
+        <div class="rapport-ref-row">RÉDACTEUR <span>MATHURIN — CENTURION</span></div>
+        <div class="rapport-ref-row">CLASSIFICATION <span>CHEF / CHEFFE / 🫡</span></div>
+      </div>
+
+      <div class="rapport-objet">Objet : ${data.objet}</div>
+
+      ${sectionsHtml}
+
+      <div class="rapport-section">
+        <div class="rapport-section-title">IV. Conclusion — accès restreint</div>
+        <div class="rapport-classified">
+          <div class="rapport-classified-label">🔒 Section classifiée</div>
+          ${data.classifie}
+        </div>
+      </div>
+
+      <div class="rapport-sig">
+        Signé : ${data.signataire}
+      </div>
+    </div>
   `;
 }
 
