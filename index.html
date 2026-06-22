@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1498,6 +1499,61 @@ const CONTENT = {
       { id: "finale" }
     ]
   },
+  12: {
+    type: "datesquiz",
+    intro: "Aujourd'hui ça fait exactement 6 mois qu'on est ensemble. 12 février.<br><br>Mais t'as bonne mémoire sur le reste ? On va voir ça.",
+    questions: [
+      {
+        id: "parle",
+        question: "Le jour où on a commencé à se parler pour la première fois ?",
+        type: "free",
+        answer: { day: 9, month: 1 },
+        taquin: "C'est le 9 janvier... t'as oublié le jour où tout a commencé 😭"
+      },
+      {
+        id: "bisou",
+        question: "Notre premier bisou, c'était quel jour ?",
+        type: "free",
+        answer: { day: 16, month: 1 },
+        taquin: "16 janvier ! T'étais là pourtant 😏"
+      },
+      {
+        id: "chop",
+        question: "Et la première fois qu'on s'est chopés ?",
+        type: "free",
+        answer: { day: 17, month: 1 },
+        taquin: "Le 17 janvier... le lendemain. La suite logique 😇"
+      },
+      {
+        id: "jetaime",
+        question: "La première fois qu'on s'est dit je t'aime ?",
+        type: "free",
+        answer: { day: 30, month: 1 },
+        taquin: "30 janvier ! C'était beau quand même non 🥺"
+      },
+      {
+        id: "velib",
+        question: "Notre balade Vélib jusqu'à la Tour Eiffel, c'était quand ?",
+        type: "free",
+        answer: { day: 7, month: 2 },
+        taquin: "Ahh... le 7 février. Intéressant que tu t'en souviennes pas de celle-là. On parle souvent du resto, de la première fois, du premier bisou... mais jamais de cette sortie. Peut-être parce qu'elle était trop bien ? 😌🚲"
+      },
+      {
+        id: "bail",
+        question: "Notre premier bail ensemble ?",
+        type: "free",
+        answer: [{ day: 13, month: 2 }, { day: 14, month: 2 }],
+        taquin: "C'était le 13 ou le 14 février... t'as même pas la bonne semaine 😂"
+      },
+      {
+        id: "ensemble",
+        question: "Et le jour où on s'est mis ensemble officiellement ?",
+        type: "free",
+        answer: { day: 12, month: 2 },
+        taquin: "... c'est aujourd'hui. Le 12 février. Bon anniversaire à nous 💕"
+      }
+    ]
+  },
   // ... continuer jusqu'a 46
   46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -1512,7 +1568,8 @@ const TAG_LABELS = {
   wordpuzzle: "Petit jeu",
   rapport: "Rapport officiel",
   velib: "Un souvenir",
-  wrapped: "Notre Wrapped"
+  wrapped: "Notre Wrapped",
+  datesquiz: "Petit quiz"
 };
 
 /* ==================================================== */
@@ -1632,6 +1689,15 @@ function showDay(day){
       <div id="wrapped-root"></div>
     `;
     initWrapped(data);
+  } else if(data.type === 'datesquiz'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">Petit quiz</div>
+      <div class="content-text reveal" style="animation-delay:0.1s;">${data.intro}</div>
+      <div id="datesquiz-root" class="reveal" style="animation-delay:0.2s;"></div>
+    `;
+    initDatesQuiz(data);
   } else if(data.type === 'velib'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2527,6 +2593,150 @@ function initWrapped(data){
   }
 }
 
+
+function initDatesQuiz(data){
+  const root = document.getElementById('datesquiz-root');
+  if(!root) return;
+
+  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+  // Normalise une saisie en {day, month} ou null
+  function parseInput(raw){
+    const s = raw.trim().toLowerCase()
+      .replace(/\//g,'-').replace(/\s+/g,' ')
+      .replace(/1er/,'1');
+
+    // formats numériques : 09/01, 9-1, 09-01, 9/1
+    let m = s.match(/^(\d{1,2})[-\/](\d{1,2})$/);
+    if(m) return { day: parseInt(m[1]), month: parseInt(m[2]) };
+
+    // "9 janvier", "09 janvier"
+    for(let i=0;i<MOIS.length;i++){
+      const mo = MOIS[i];
+      const re = new RegExp('^(\\d{1,2})\\s+' + mo.replace('é','[eé]').replace('û','[uû]') + '$');
+      if(re.test(s)){
+        const dm = s.match(/^(\d{1,2})/);
+        if(dm) return { day: parseInt(dm[1]), month: i+1 };
+      }
+    }
+    // "janvier 9"
+    for(let i=0;i<MOIS.length;i++){
+      const mo = MOIS[i];
+      const re = new RegExp('^' + mo.replace('é','[eé]').replace('û','[uû]') + '\\s+(\\d{1,2})$');
+      const mm = s.match(re);
+      if(mm) return { day: parseInt(mm[1]), month: i+1 };
+    }
+    return null;
+  }
+
+  function isCorrect(parsed, answer){
+    if(!parsed) return false;
+    const answers = Array.isArray(answer) ? answer : [answer];
+    return answers.some(a => a.day === parsed.day && a.month === parsed.month);
+  }
+
+  let current = 0;
+  let score = 0;
+  const total = data.questions.length;
+
+  function renderQuestion(){
+    if(current >= total){
+      renderResult();
+      return;
+    }
+    const q = data.questions[current];
+    root.innerHTML = `
+      <div class="dq-progress">${current+1} / ${total}</div>
+      <div class="dq-question">${q.question}</div>
+      <input class="dq-input" type="text" placeholder="ex : 9 janvier ou 09/01" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="dq-btn">Valider</button>
+      <div class="dq-feedback"></div>
+    `;
+    const input = root.querySelector('.dq-input');
+    const btn = root.querySelector('.dq-btn');
+    const fb = root.querySelector('.dq-feedback');
+
+    function validate(){
+      const val = input.value;
+      const parsed = parseInput(val);
+      if(isCorrect(parsed, q.answer)){
+        score++;
+        fb.className = 'dq-feedback dq-ok';
+        fb.textContent = '✓ Bonne réponse !';
+        btn.disabled = true;
+        input.disabled = true;
+        setTimeout(next, 1200);
+      } else {
+        fb.className = 'dq-feedback dq-wrong';
+        fb.textContent = q.taquin;
+        btn.disabled = true;
+        input.disabled = true;
+        setTimeout(next, 3200);
+      }
+    }
+
+    btn.addEventListener('click', validate);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') validate(); });
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function next(){
+    current++;
+    renderQuestion();
+  }
+
+  function renderResult(){
+    const parfait = score === total;
+    const bien = score >= total - 1;
+    let msg;
+    if(parfait) msg = "Parfait score. T'as tout bon. Je t'aime trop 🥺💕";
+    else if(bien) msg = `${score}/${total}. Presque parfait — comme nous 💕`;
+    else msg = `${score}/${total}. T'as encore des progrès à faire mais je t'aime quand même 😌`;
+
+    root.innerHTML = `
+      <div class="dq-result">
+        <div class="dq-score">${score}<span>/${total}</span></div>
+        <div class="dq-result-msg">${msg}</div>
+        <div class="dq-result-sub">Joyeux 6 mois ❤️</div>
+      </div>
+    `;
+  }
+
+  // Styles injectés une fois
+  if(!document.getElementById('dq-style')){
+    const s = document.createElement('style');
+    s.id = 'dq-style';
+    s.textContent = `
+      #datesquiz-root { margin-top: 22px; }
+      .dq-progress { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--ink-soft); margin-bottom:14px; }
+      .dq-question { font-family:var(--serif); font-size:17px; line-height:1.6; color:var(--ink); margin-bottom:16px; }
+      .dq-input {
+        width:100%; padding:13px 14px; border-radius:12px;
+        border:1.5px solid var(--line); background:var(--card);
+        font-size:16px; color:var(--ink); font-family:var(--sans);
+        margin-bottom:10px; text-align:center;
+      }
+      .dq-input:focus { outline:none; border-color:var(--accent); }
+      .dq-btn {
+        width:100%; padding:13px; border-radius:12px; border:none;
+        background:var(--accent); color:#fff; font-size:15px; cursor:pointer;
+        margin-bottom:10px;
+      }
+      .dq-btn:disabled { opacity:0.4; cursor:not-allowed; }
+      .dq-feedback { font-size:13px; line-height:1.5; min-height:20px; color:var(--ink-soft); font-style:italic; }
+      .dq-feedback.dq-ok { color:#4a8c5c; font-style:normal; font-weight:600; }
+      .dq-feedback.dq-wrong { color:var(--accent); }
+      .dq-result { text-align:center; padding:20px 0 10px; }
+      .dq-score { font-size:64px; font-weight:800; color:var(--accent); font-family:var(--sans); line-height:1; }
+      .dq-score span { font-size:28px; color:var(--ink-soft); }
+      .dq-result-msg { font-family:var(--serif); font-size:18px; line-height:1.6; color:var(--ink); margin:16px 0 8px; }
+      .dq-result-sub { font-size:13px; color:var(--ink-soft); }
+    `;
+    document.head.appendChild(s);
+  }
+
+  renderQuestion();
+}
 
 function closeDay(){
   const panel = document.getElementById('content-panel');
