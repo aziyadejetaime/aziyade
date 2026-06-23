@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>46 jours</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
 <style>
   :root{
     --bg: #faf7f2;
@@ -2071,8 +2079,8 @@ function initLego3D(glbPath) {
 
   // Charger Three.js + GLTFLoader via ES Modules
   Promise.all([
-    import('https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js'),
-    import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/loaders/GLTFLoader.js')
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js')
   ]).then(function([THREE, { GLTFLoader }]) {
       const W = wrap.clientWidth, H = wrap.clientHeight;
 
