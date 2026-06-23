@@ -2001,7 +2001,7 @@ function velibNo(){
 }
 
 /* ---------- WRAPPED (jour 14) ---------- */
-function initWrapped(data){
+function initWrappedBase(data){
   const root = document.getElementById('wrapped-root');
   const TOTAL = data.slides.length;
   let current = 0;
@@ -2621,9 +2621,8 @@ function restartDay(dayNum, gameType){
 }
 
 /* Wrapped : sauvegarde slide courante */
-const _origInitWrapped = initWrapped;
 function initWrapped(data, dayNum){
-  _origInitWrapped(data);
+  initWrappedBase(data);
   const saved=DayState.load(dayNum);
   const startSlide=(saved&&saved.type==='wrapped')?(saved.slide||0):0;
   setTimeout(()=>{
