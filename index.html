@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -2079,8 +2077,8 @@ function initLego3D(glbPath) {
     document.head.appendChild(s);
   }
 
-  loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js', function() {
-    loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', function() {
+  loadScript('https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js', function() {
+    loadScript('https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/GLTFLoader.js', function() {
       const W = wrap.clientWidth, H = wrap.clientHeight;
 
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
