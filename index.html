@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -518,6 +519,73 @@
     padding: 30px 20px;
     color: var(--ink-soft);
     font-size: 14px;
+  }
+
+  /* ---------- JUMP SCARE (jour 24) ---------- */
+  .js-text{
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+  .js-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    background: var(--ink);
+    color: #fff;
+    font-size: 15px;
+    font-family: var(--serif);
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+  .js-btn:active{ transform: scale(0.98); }
+
+  #js-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  #js-overlay.visible{ display: flex; }
+  #js-overlay video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #js-close{
+    position: fixed;
+    top: 18px; right: 18px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 201;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  #js-flash{
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 202;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.05s;
   }
 
   /* ---------- RAPPORT OFFICIEL MILITAIRE (jour 5) ---------- */
@@ -1628,6 +1696,11 @@ const CONTENT = {
     image: "images/lego_day23.png",
     glb: "lego_day23.glb"
   },
+  24: {
+    type: "jumpscare",
+    text: "Après la Comédie Française, on avait marché jusqu'aux quais.<br><br>Je me souviens plus exactement de quoi on parlait... mais je me souviens de la Seine, des lumières, et que j'avais sorti mon téléphone pour filmer.<br><br>J'avais retrouvé cette vidéo.",
+    video: "images/day24.mp4"
+  },
   // ... continuer jusqu'a 46
   46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -1644,7 +1717,8 @@ const TAG_LABELS = {
   velib: "Un souvenir",
   wrapped: "Notre Wrapped",
   datesquiz: "Petit quiz",
-  lego: "Nous deux en Lego 🧱"
+  lego: "Nous deux en Lego 🧱",
+  jumpscare: "Un souvenir 🌙"
 };
 
 /* ==================================================== */
@@ -1791,6 +1865,16 @@ function showDay(day){
       </div>
     `;
     initLego3D(data.glb);
+  } else if(data.type === 'jumpscare'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.jumpscare}</div>
+      <div class="js-text reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <button class="js-btn reveal" style="animation-delay:0.3s;" onclick="launchJumpScare('${data.video}')">
+        ▶ &nbsp;Regarder
+      </button>
+    `;
   } else if(data.type === 'velib'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2768,6 +2852,47 @@ function renderDatesResult(data, answers, dayNum){
   root.innerHTML=`<div class="dq-result"><div class="dq-score">${score}<span>/${total}</span></div><div class="dq-result-msg">${msg}</div><div class="dq-result-sub">Joyeux 6 mois ❤️</div></div><button class="btn-restart" onclick="restartDay(${dayNum},'datesquiz')">Recommencer ↺</button>`;
 }
 
+/* ============================================================
+   JUMP SCARE — jour 24
+   ============================================================ */
+function launchJumpScare(src){
+  const overlay = document.getElementById('js-overlay');
+  const video   = document.getElementById('js-video');
+  const closeBtn= document.getElementById('js-close');
+  const flash   = document.getElementById('js-flash');
+
+  video.src = src;
+  overlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+
+  video.play().catch(()=>{});
+
+  // Flash blanc + vibration à la fin
+  video.addEventListener('timeupdate', function onTime(){
+    if(video.duration && video.currentTime >= video.duration - 0.6){
+      video.removeEventListener('timeupdate', onTime);
+      flash.style.opacity = '1';
+      if(navigator.vibrate) navigator.vibrate([80, 40, 120]);
+      setTimeout(()=>{ flash.style.opacity = '0'; }, 120);
+    }
+  });
+
+  // Affiche le bouton fermer après la fin
+  video.addEventListener('ended', function(){
+    closeBtn.style.opacity = '1';
+  });
+}
+
+function closeJumpScare(){
+  const overlay = document.getElementById('js-overlay');
+  const video   = document.getElementById('js-video');
+  video.pause();
+  video.src = '';
+  overlay.classList.remove('visible');
+  document.getElementById('js-close').style.opacity = '0';
+  document.body.style.overflow = '';
+}
+
 function closeDay(){
   const panel = document.getElementById('content-panel');
   panel.classList.remove('visible');
@@ -2850,6 +2975,13 @@ function initWrapped(data, dayNum){
 }
 
 </script>
+
+<!-- JUMP SCARE OVERLAY -->
+<div id="js-overlay">
+  <video id="js-video" playsinline webkit-playsinline preload="auto"></video>
+  <div id="js-close" onclick="closeJumpScare()">&times;</div>
+</div>
+<div id="js-flash"></div>
 
 </body>
 </html>
