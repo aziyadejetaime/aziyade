@@ -2069,16 +2069,11 @@ function initLego3D(glbPath) {
   const canvas = document.getElementById('lego-canvas');
   if (!wrap || !canvas) return;
 
-  // Charger Three.js + GLTFLoader dynamiquement
-  function loadScript(src, cb) {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = cb;
-    document.head.appendChild(s);
-  }
-
-  loadScript('https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js', function() {
-    loadScript('https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/GLTFLoader.js', function() {
+  // Charger Three.js + GLTFLoader via ES Modules
+  Promise.all([
+    import('https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js'),
+    import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/loaders/GLTFLoader.js')
+  ]).then(function([THREE, { GLTFLoader }]) {
       const W = wrap.clientWidth, H = wrap.clientHeight;
 
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -2087,7 +2082,7 @@ function initLego3D(glbPath) {
       renderer.shadowMap.enabled = true;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.2;
-      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x1a1218);
@@ -2111,7 +2106,7 @@ function initLego3D(glbPath) {
       scene.add(rim);
 
       // Charger le GLB
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       loader.load(glbPath, function(gltf) {
         const model = gltf.scene;
 
@@ -2185,7 +2180,9 @@ function initLego3D(glbPath) {
         console.error('GLB load error', err);
         wrap.innerHTML = '<p style="color:#fff;text-align:center;padding:40px;opacity:0.5;">Modèle 3D non disponible</p>';
       });
-    });
+  }).catch(function(err) {
+    console.error('Erreur chargement Three.js', err);
+    wrap.innerHTML = '<p style="color:#fff;text-align:center;padding:40px;opacity:0.5;">Modèle 3D non disponible</p>';
   });
 }
 
