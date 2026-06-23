@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1337,6 +1336,12 @@
     letter-spacing: 0.5px;
   }
   .w-final-sig.show{ opacity: 1; }
+
+  /* btn-restart + wrong-shake */
+  .btn-restart{display:block;width:100%;margin-top:20px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink-soft);font-size:14px;cursor:pointer;}
+  .btn-restart:hover{background:var(--locked);}
+  .memory-card.wrong .memory-card-inner{animation:wrong-shake 0.45s ease;}
+  @keyframes wrong-shake{0%{transform:rotateY(180deg);}20%{transform:rotateY(180deg) translateX(-4px);}40%{transform:rotateY(180deg) translateX(4px);}60%{transform:rotateY(180deg) translateX(-3px);}80%{transform:rotateY(180deg) translateX(0);}100%{transform:rotateY(0deg);}}
 </style>
 </head>
 <body>
@@ -1664,7 +1669,7 @@ function showDay(day){
       <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
       <div id="memory-root"></div>
     `;
-    initMemoryGame(data);
+    initMemoryGame(data, day);
   } else if(data.type === 'wordpuzzle'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -1673,7 +1678,7 @@ function showDay(day){
       <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
       <div id="puzzle-root"></div>
     `;
-    initWordPuzzle(data);
+    initWordPuzzle(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -1688,7 +1693,7 @@ function showDay(day){
       <div class="close-card" onclick="closeDay()" style="z-index:30;">&times;</div>
       <div id="wrapped-root"></div>
     `;
-    initWrapped(data);
+    initWrapped(data, day);
   } else if(data.type === 'datesquiz'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -1697,7 +1702,7 @@ function showDay(day){
       <div class="content-text reveal" style="animation-delay:0.1s;">${data.intro}</div>
       <div id="datesquiz-root" class="reveal" style="animation-delay:0.2s;"></div>
     `;
-    initDatesQuiz(data);
+    initDatesQuiz(data, day);
   } else if(data.type === 'velib'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -1767,243 +1772,130 @@ document.getElementById('lightbox').addEventListener('click', function(e){
   if(e.target.id === 'lightbox') closeLightbox();
 });
 
-/* ---------- MEMORY GAME ---------- */
-function initMemoryGame(data){
+/* ---------- MEMORY GAME (avec sauvegarde) ---------- */
+function initMemoryGame(data, dayNum){
   const pairs = data.pairs;
-  let cards = [];
-  pairs.forEach((p, i) => {
-    cards.push({ pairId: i, src: p.src, caption: p.caption });
-    cards.push({ pairId: i, src: p.src, caption: p.caption });
-  });
-  // shuffle (Fisher-Yates)
-  for(let i = cards.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
+  const root = document.getElementById('memory-root');
+  let saved = DayState.load(dayNum);
+  let cards, matchedSet, state;
+
+  if(saved && saved.type==='memory' && saved.cardOrder){
+    cards = saved.cardOrder.map(o=>({ pairId:o.pairId, src:pairs[o.pairId].src, caption:pairs[o.pairId].caption }));
+    matchedSet = new Set(saved.matched||[]);
+    state = saved.state||'playing';
+  } else {
+    let base=[];
+    pairs.forEach((p,i)=>{ base.push({pairId:i,src:p.src,caption:p.caption}); base.push({pairId:i,src:p.src,caption:p.caption}); });
+    for(let i=base.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [base[i],base[j]]=[base[j],base[i]]; }
+    cards=base; matchedSet=new Set(); state='playing';
+    DayState.save(dayNum,{type:'memory',cardOrder:cards.map(c=>({pairId:c.pairId})),matched:[],state:'playing'});
   }
 
-  let flipped = [];
-  let matchedCount = 0;
-  let lock = false;
+  if(state==='won'){ showMemoryWin(data,dayNum); return; }
 
-  const root = document.getElementById('memory-root');
-  root.innerHTML = `
-    <div class="memory-grid" id="memory-grid"></div>
-    <div class="memory-progress" id="memory-progress">0 / ${pairs.length} paires trouvees</div>
-  `;
-  const grid = document.getElementById('memory-grid');
+  let flipped=[], lock=false, matchedCount=matchedSet.size/2;
+  root.innerHTML=`<div class="memory-grid" id="memory-grid"></div><div class="memory-progress" id="memory-progress">${matchedCount} / ${pairs.length} paires trouvées</div>`;
+  const grid=document.getElementById('memory-grid');
 
-  cards.forEach((c, idx) => {
-    const cardEl = document.createElement('div');
-    cardEl.className = 'memory-card';
-    cardEl.dataset.idx = idx;
-    cardEl.innerHTML = `
-      <div class="memory-card-inner">
-        <div class="memory-card-face memory-card-front">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" transform="rotate(45 12 12)"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.97-3.2-9-7.5-9-11.3C3 6.5 5.2 4.5 7.8 4.5c1.8 0 3.3 1 4.2 2.4.9-1.4 2.4-2.4 4.2-2.4C18.8 4.5 21 6.5 21 9.7c0 3.8-4.03 8.1-9 11.3z"/></svg>
-        </div>
-        <div class="memory-card-face memory-card-back">
-          <img src="${c.src}" alt="">
-        </div>
-      </div>
-    `;
-    cardEl.addEventListener('click', () => flipCard(idx, cardEl));
+  cards.forEach((c,idx)=>{
+    const cardEl=document.createElement('div');
+    cardEl.className='memory-card';
+    if(matchedSet.has(idx)) cardEl.classList.add('matched','flipped');
+    cardEl.innerHTML=`<div class="memory-card-inner"><div class="memory-card-face memory-card-front"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.97-3.2-9-7.5-9-11.3C3 6.5 5.2 4.5 7.8 4.5c1.8 0 3.3 1 4.2 2.4.9-1.4 2.4-2.4 4.2-2.4C18.8 4.5 21 6.5 21 9.7c0 3.8-4.03 8.1-9 11.3z"/></svg></div><div class="memory-card-face memory-card-back"><img src="${c.src}" alt="" class="lightbox-trigger" data-src="${escapeAttr(c.src)}" data-caption="${escapeAttr(c.caption||'')}"></div></div>`;
+    cardEl.addEventListener('click',()=>flipCard(idx,cardEl));
     grid.appendChild(cardEl);
   });
 
-  function flipCard(idx, cardEl){
-    if(lock) return;
-    if(cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
-    if(flipped.length === 2) return;
+  function saveNow(){ DayState.save(dayNum,{type:'memory',cardOrder:cards.map(c=>({pairId:c.pairId})),matched:[...matchedSet],state:matchedCount===pairs.length?'won':'playing'}); }
 
+  function flipCard(idx,cardEl){
+    if(lock||cardEl.classList.contains('flipped')||cardEl.classList.contains('matched')||flipped.length===2) return;
     cardEl.classList.add('flipped');
-    flipped.push({ idx, cardEl, pairId: cards[idx].pairId });
-
-    if(flipped.length === 2){
-      lock = true;
-      const [a, b] = flipped;
-      if(a.pairId === b.pairId){
-        setTimeout(() => {
-          a.cardEl.classList.add('matched');
-          b.cardEl.classList.add('matched');
-          matchedCount++;
-          document.getElementById('memory-progress').textContent = `${matchedCount} / ${pairs.length} paires trouvees`;
-          flipped = [];
-          lock = false;
-          if(matchedCount === pairs.length){
-            setTimeout(() => showMemoryWin(data), 500);
-          }
-        }, 350);
+    flipped.push({idx,cardEl,pairId:cards[idx].pairId});
+    if(flipped.length===2){
+      lock=true;
+      const [a,b]=flipped;
+      if(a.pairId===b.pairId){
+        setTimeout(()=>{
+          a.cardEl.classList.add('matched'); b.cardEl.classList.add('matched');
+          matchedSet.add(a.idx); matchedSet.add(b.idx); matchedCount++;
+          document.getElementById('memory-progress').textContent=`${matchedCount} / ${pairs.length} paires trouvées`;
+          flipped=[]; lock=false; saveNow();
+          if(matchedCount===pairs.length){ DayState.save(dayNum,{type:'memory',cardOrder:cards.map(c=>({pairId:c.pairId})),matched:[...matchedSet],state:'won'}); setTimeout(()=>showMemoryWin(data,dayNum),500); }
+        },350);
       } else {
-        setTimeout(() => {
-          a.cardEl.classList.remove('flipped');
-          b.cardEl.classList.remove('flipped');
-          flipped = [];
-          lock = false;
-        }, 1100);
+        setTimeout(()=>{
+          a.cardEl.classList.add('wrong'); b.cardEl.classList.add('wrong');
+          setTimeout(()=>{ a.cardEl.classList.remove('flipped','wrong'); b.cardEl.classList.remove('flipped','wrong'); flipped=[]; lock=false; },450);
+        },600);
       }
     }
   }
 }
 
-function showMemoryWin(data){
-  const card = document.getElementById('content-card');
-  let delay = 0;
-  const step = 0.1;
-  const recapHtml = data.pairs.map(p => {
-    delay += step;
-    return `<img src="${p.src}" alt="" class="reveal lightbox-trigger" style="animation-delay:${delay}s;" data-src="${escapeAttr(p.src)}" data-caption="${escapeAttr(p.caption || '')}">`;
-  }).join('');
-  delay += step;
-  card.innerHTML = `
-    <div class="drag-handle"></div>
-    <div class="close-card" onclick="closeDay()">&times;</div>
-    <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.minigame}</div>
-    <div class="memory-win-text reveal" style="animation-delay:0.08s;">${data.winText || data.text}</div>
-    <div class="memory-recap">${recapHtml}</div>
-  `;
+function showMemoryWin(data, dayNum){
+  const card=document.getElementById('content-card');
+  let delay=0; const step=0.1;
+  const recapHtml=data.pairs.map(p=>{ delay+=step; return `<img src="${p.src}" alt="" class="reveal lightbox-trigger" style="animation-delay:${delay}s;" data-src="${escapeAttr(p.src)}" data-caption="${escapeAttr(p.caption||'')}">`;}).join('');
+  delay+=step;
+  card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.minigame}</div><div class="memory-win-text reveal" style="animation-delay:0.08s;">${data.winText||data.text}</div><div class="memory-recap">${recapHtml}</div><button class="btn-restart reveal" style="animation-delay:${delay}s;" onclick="restartDay(${dayNum},'memory')">Recommencer ↺</button>`;
 }
 
-/* ---------- WORD PUZZLE (glisser-deposer mots dans l'ordre) ---------- */
-function initWordPuzzle(data){
-  const target = data.words;
-  const root = document.getElementById('puzzle-root');
+/* ---------- WORD PUZZLE (avec sauvegarde) ---------- */
+function initWordPuzzle(data, dayNum){
+  const target=data.words;
+  const root=document.getElementById('puzzle-root');
+  let saved=DayState.load(dayNum);
+  let shuffled, slotsWords, bankWords, state;
 
-  // melange (different de l'ordre cible)
-  let shuffled;
-  do {
-    shuffled = [...target];
-    for(let i = shuffled.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-  } while(shuffled.join(' ') === target.join(' '));
-
-  root.innerHTML = `
-    <div class="puzzle-slots empty" id="puzzle-slots"></div>
-    <div class="puzzle-bank" id="puzzle-bank"></div>
-    <button class="puzzle-check" id="puzzle-check" disabled>Verifier</button>
-    <div class="puzzle-feedback" id="puzzle-feedback"></div>
-  `;
-
-  const slotsEl = document.getElementById('puzzle-slots');
-  const bankEl = document.getElementById('puzzle-bank');
-  const checkBtn = document.getElementById('puzzle-check');
-  const feedbackEl = document.getElementById('puzzle-feedback');
-
-  shuffled.forEach((word, i) => {
-    const el = document.createElement('div');
-    el.className = 'puzzle-word';
-    el.textContent = word;
-    el.dataset.word = word;
-    el.dataset.uid = 'w' + i;
-    bankEl.appendChild(el);
-    makeDraggable(el);
-  });
-
-  function updateState(){
-    slotsEl.classList.toggle('empty', slotsEl.children.length === 0);
-    checkBtn.disabled = bankEl.children.length !== 0;
+  if(saved&&saved.type==='puzzle'&&saved.bankOrder){
+    shuffled=saved.shuffledOrder; slotsWords=saved.slotsOrder||[]; bankWords=saved.bankOrder; state=saved.state||'playing';
+  } else {
+    do { shuffled=[...target]; for(let i=shuffled.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]; } } while(shuffled.join(' ')===target.join(' '));
+    slotsWords=[]; bankWords=[...shuffled]; state='playing';
+    DayState.save(dayNum,{type:'puzzle',shuffledOrder:shuffled,slotsOrder:[],bankOrder:[...shuffled],state:'playing'});
   }
+
+  if(state==='won'){ showPuzzleWin(data,dayNum); return; }
+
+  root.innerHTML=`<div class="puzzle-slots ${slotsWords.length===0?'empty':''}" id="puzzle-slots"></div><div class="puzzle-bank" id="puzzle-bank"></div><button class="puzzle-check" id="puzzle-check" disabled>Vérifier</button><div class="puzzle-feedback" id="puzzle-feedback"></div>`;
+  const slotsEl=document.getElementById('puzzle-slots');
+  const bankEl=document.getElementById('puzzle-bank');
+  const checkBtn=document.getElementById('puzzle-check');
+  const feedbackEl=document.getElementById('puzzle-feedback');
+
+  function makeWordEl(word,uid){ const el=document.createElement('div'); el.className='puzzle-word'; el.textContent=word; el.dataset.word=word; el.dataset.uid=uid; return el; }
+  function saveState(){ DayState.save(dayNum,{type:'puzzle',shuffledOrder:shuffled,slotsOrder:[...slotsEl.children].map(e=>e.dataset.word),bankOrder:[...bankEl.children].map(e=>e.dataset.word),state:'playing'}); }
+  function updateState(){ slotsEl.classList.toggle('empty',slotsEl.children.length===0); checkBtn.disabled=bankEl.children.length!==0; saveState(); }
+
+  slotsWords.forEach((w,i)=>{ const el=makeWordEl(w,'s'+i); slotsEl.appendChild(el); makeDraggable(el); });
+  bankWords.forEach((w,i)=>{ const el=makeWordEl(w,'b'+i); bankEl.appendChild(el); makeDraggable(el); });
   updateState();
 
   function makeDraggable(el){
-    let dragging = false;
-    let ghost = null;
-    let startX = 0, startY = 0;
-
-    function getDropTarget(x, y){
-      el.style.pointerEvents = 'none';
-      const under = document.elementFromPoint(x, y);
-      el.style.pointerEvents = '';
-      if(!under) return null;
-      return under.closest('.puzzle-slots, .puzzle-bank');
-    }
-
-    function onMove(clientX, clientY){
-      if(!dragging) return;
-      ghost.style.left = (clientX - ghost.offsetWidth / 2) + 'px';
-      ghost.style.top = (clientY - ghost.offsetHeight / 2) + 'px';
-    }
-
-    function onEnd(clientX, clientY){
-      if(!dragging) return;
-      dragging = false;
-      el.classList.remove('dragging');
-      ghost.remove();
-      ghost = null;
-
-      const dropZone = getDropTarget(clientX, clientY);
-      if(dropZone){
-        dropZone.appendChild(el);
-      }
-      feedbackEl.textContent = '';
-      feedbackEl.classList.remove('wrong');
-      updateState();
-
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-      document.removeEventListener('touchmove', touchMoveHandler);
-      document.removeEventListener('touchend', touchEndHandler);
-    }
-
-    function mouseMoveHandler(e){ onMove(e.clientX, e.clientY); }
-    function mouseUpHandler(e){ onEnd(e.clientX, e.clientY); }
-    function touchMoveHandler(e){
-      const t = e.touches[0];
-      onMove(t.clientX, t.clientY);
-      e.preventDefault();
-    }
-    function touchEndHandler(e){
-      const t = e.changedTouches[0];
-      onEnd(t.clientX, t.clientY);
-    }
-
-    function startDrag(clientX, clientY){
-      dragging = true;
-      startX = clientX; startY = clientY;
-      el.classList.add('dragging');
-
-      ghost = el.cloneNode(true);
-      ghost.classList.add('drag-ghost');
-      ghost.classList.remove('dragging');
-      ghost.style.width = el.offsetWidth + 'px';
-      document.body.appendChild(ghost);
-      onMove(clientX, clientY);
-    }
-
-    el.addEventListener('mousedown', e => {
-      e.preventDefault();
-      startDrag(e.clientX, e.clientY);
-      document.addEventListener('mousemove', mouseMoveHandler);
-      document.addEventListener('mouseup', mouseUpHandler);
-    });
-    el.addEventListener('touchstart', e => {
-      const t = e.touches[0];
-      startDrag(t.clientX, t.clientY);
-      document.addEventListener('touchmove', touchMoveHandler, { passive: false });
-      document.addEventListener('touchend', touchEndHandler);
-    }, { passive: true });
+    let dragging=false, ghost=null;
+    function getDropTarget(x,y){ el.style.pointerEvents='none'; const u=document.elementFromPoint(x,y); el.style.pointerEvents=''; if(!u) return null; return u.closest('.puzzle-slots,.puzzle-bank'); }
+    function onMove(cx,cy){ if(!dragging) return; ghost.style.left=(cx-ghost.offsetWidth/2)+'px'; ghost.style.top=(cy-ghost.offsetHeight/2)+'px'; }
+    function onEnd(cx,cy){ if(!dragging) return; dragging=false; el.classList.remove('dragging'); ghost.remove(); ghost=null; const dz=getDropTarget(cx,cy); if(dz) dz.appendChild(el); feedbackEl.textContent=''; feedbackEl.classList.remove('wrong'); updateState(); document.removeEventListener('mousemove',mmH); document.removeEventListener('mouseup',muH); document.removeEventListener('touchmove',tmH); document.removeEventListener('touchend',teH); }
+    function mmH(e){ onMove(e.clientX,e.clientY); }
+    function muH(e){ onEnd(e.clientX,e.clientY); }
+    function tmH(e){ onMove(e.touches[0].clientX,e.touches[0].clientY); e.preventDefault(); }
+    function teH(e){ onEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY); }
+    function startDrag(cx,cy){ dragging=true; el.classList.add('dragging'); ghost=el.cloneNode(true); ghost.classList.add('drag-ghost'); ghost.classList.remove('dragging'); ghost.style.width=el.offsetWidth+'px'; document.body.appendChild(ghost); onMove(cx,cy); }
+    el.addEventListener('mousedown',e=>{ e.preventDefault(); startDrag(e.clientX,e.clientY); document.addEventListener('mousemove',mmH); document.addEventListener('mouseup',muH); });
+    el.addEventListener('touchstart',e=>{ const t=e.touches[0]; startDrag(t.clientX,t.clientY); document.addEventListener('touchmove',tmH,{passive:false}); document.addEventListener('touchend',teH); },{passive:true});
   }
 
-  checkBtn.addEventListener('click', () => {
-    const order = [...slotsEl.children].map(el => el.dataset.word);
-    if(order.join(' ') === target.join(' ')){
-      setTimeout(() => showPuzzleWin(data), 300);
-    } else {
-      feedbackEl.textContent = "Pas tout a fait... reessaie.";
-      feedbackEl.classList.add('wrong');
-    }
+  checkBtn.addEventListener('click',()=>{
+    const order=[...slotsEl.children].map(e=>e.dataset.word);
+    if(order.join(' ')===target.join(' ')){ DayState.save(dayNum,{type:'puzzle',shuffledOrder:shuffled,slotsOrder:order,bankOrder:[],state:'won'}); setTimeout(()=>showPuzzleWin(data,dayNum),300); }
+    else { feedbackEl.textContent="Pas tout à fait... réessaie."; feedbackEl.classList.add('wrong'); }
   });
 }
 
-function showPuzzleWin(data){
-  const card = document.getElementById('content-card');
-  card.innerHTML = `
-    <div class="drag-handle"></div>
-    <div class="close-card" onclick="closeDay()">&times;</div>
-    <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.wordpuzzle}</div>
-    <div class="puzzle-win-text reveal" style="animation-delay:0.1s;">${data.winText}</div>
-  `;
+function showPuzzleWin(data, dayNum){
+  const card=document.getElementById('content-card');
+  card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.wordpuzzle}</div><div class="puzzle-win-text reveal" style="animation-delay:0.1s;">${data.winText}</div><button class="btn-restart reveal" style="animation-delay:0.2s;" onclick="restartDay(${dayNum},'puzzle')">Recommencer ↺</button>`;
 }
 
 /* ---------- RAPPORT OFFICIEL ---------- */
@@ -2594,148 +2486,75 @@ function initWrapped(data){
 }
 
 
-function initDatesQuiz(data){
-  const root = document.getElementById('datesquiz-root');
+function initDatesQuiz(data, dayNum){
+  const root=document.getElementById('datesquiz-root');
   if(!root) return;
+  const questions=data.questions;
+  let saved=DayState.load(dayNum);
+  let answers, current, state;
+  if(saved&&saved.type==='datesquiz'){ answers=saved.answers||[]; current=saved.current||0; state=saved.state||'playing'; }
+  else { answers=[]; current=0; state='playing'; DayState.save(dayNum,{type:'datesquiz',answers:[],current:0,state:'playing'}); }
+  if(state==='won'||current>=questions.length){ renderDatesResult(data,answers,dayNum); return; }
 
-  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
-  // Normalise une saisie en {day, month} ou null
   function parseInput(raw){
-    const s = raw.trim().toLowerCase()
-      .replace(/\//g,'-').replace(/\s+/g,' ')
-      .replace(/1er/,'1');
-
-    // formats numériques : 09/01, 9-1, 09-01, 9/1
-    let m = s.match(/^(\d{1,2})[-\/](\d{1,2})$/);
-    if(m) return { day: parseInt(m[1]), month: parseInt(m[2]) };
-
-    // "9 janvier", "09 janvier"
+    const s=raw.trim().toLowerCase().replace(/\//g,'-').replace(/\s+/g,' ').replace(/1er/,'1');
+    let m=s.match(/^(\d{1,2})[-\/](\d{1,2})$/);
+    if(m) return {day:parseInt(m[1]),month:parseInt(m[2])};
     for(let i=0;i<MOIS.length;i++){
-      const mo = MOIS[i];
-      const re = new RegExp('^(\\d{1,2})\\s+' + mo.replace('é','[eé]').replace('û','[uû]') + '$');
-      if(re.test(s)){
-        const dm = s.match(/^(\d{1,2})/);
-        if(dm) return { day: parseInt(dm[1]), month: i+1 };
-      }
-    }
-    // "janvier 9"
-    for(let i=0;i<MOIS.length;i++){
-      const mo = MOIS[i];
-      const re = new RegExp('^' + mo.replace('é','[eé]').replace('û','[uû]') + '\\s+(\\d{1,2})$');
-      const mm = s.match(re);
-      if(mm) return { day: parseInt(mm[1]), month: i+1 };
+      const re=new RegExp('(\\d{1,2})\\s*'+MOIS[i].substring(0,4));
+      const match=s.match(re);
+      if(match) return {day:parseInt(match[1]),month:i+1};
     }
     return null;
   }
 
-  function isCorrect(parsed, answer){
+  function checkAnswer(parsed,q){
     if(!parsed) return false;
-    const answers = Array.isArray(answer) ? answer : [answer];
-    return answers.some(a => a.day === parsed.day && a.month === parsed.month);
+    const targets=Array.isArray(q.answer)?q.answer:[q.answer];
+    return targets.some(t=>t.day===parsed.day&&t.month===parsed.month);
   }
 
-  let current = 0;
-  let score = 0;
-  const total = data.questions.length;
+  function saveState(){ DayState.save(dayNum,{type:'datesquiz',answers,current,state:current>=questions.length?'won':'playing'}); }
 
   function renderQuestion(){
-    if(current >= total){
-      renderResult();
-      return;
-    }
-    const q = data.questions[current];
-    root.innerHTML = `
-      <div class="dq-progress">${current+1} / ${total}</div>
-      <div class="dq-question">${q.question}</div>
-      <input class="dq-input" type="text" placeholder="ex : 9 janvier ou 09/01" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="dq-btn">Valider</button>
-      <div class="dq-feedback"></div>
-    `;
-    const input = root.querySelector('.dq-input');
-    const btn = root.querySelector('.dq-btn');
-    const fb = root.querySelector('.dq-feedback');
-
-    function validate(){
-      const val = input.value;
-      const parsed = parseInput(val);
-      if(isCorrect(parsed, q.answer)){
-        score++;
-        fb.className = 'dq-feedback dq-ok';
-        fb.textContent = '✓ Bonne réponse !';
-        btn.disabled = true;
-        input.disabled = true;
-        setTimeout(next, 1200);
-      } else {
-        fb.className = 'dq-feedback dq-wrong';
-        fb.textContent = q.taquin;
-        btn.disabled = true;
-        input.disabled = true;
-        setTimeout(next, 3200);
-      }
-    }
-
-    btn.addEventListener('click', validate);
-    input.addEventListener('keydown', e => { if(e.key === 'Enter') validate(); });
-    setTimeout(() => input.focus(), 100);
-  }
-
-  function next(){
-    current++;
-    renderQuestion();
-  }
-
-  function renderResult(){
-    const parfait = score === total;
-    const bien = score >= total - 1;
-    let msg;
-    if(parfait) msg = "Parfait score. T'as tout bon. Je t'aime trop 🥺💕";
-    else if(bien) msg = `${score}/${total}. Presque parfait — comme nous 💕`;
-    else msg = `${score}/${total}. T'as encore des progrès à faire mais je t'aime quand même 😌`;
-
-    root.innerHTML = `
-      <div class="dq-result">
-        <div class="dq-score">${score}<span>/${total}</span></div>
-        <div class="dq-result-msg">${msg}</div>
-        <div class="dq-result-sub">Joyeux 6 mois ❤️</div>
-      </div>
-    `;
-  }
-
-  // Styles injectés une fois
-  if(!document.getElementById('dq-style')){
-    const s = document.createElement('style');
-    s.id = 'dq-style';
-    s.textContent = `
-      #datesquiz-root { margin-top: 22px; }
-      .dq-progress { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--ink-soft); margin-bottom:14px; }
-      .dq-question { font-family:var(--serif); font-size:17px; line-height:1.6; color:var(--ink); margin-bottom:16px; }
-      .dq-input {
-        width:100%; padding:13px 14px; border-radius:12px;
-        border:1.5px solid var(--line); background:var(--card);
-        font-size:16px; color:var(--ink); font-family:var(--sans);
-        margin-bottom:10px; text-align:center;
-      }
-      .dq-input:focus { outline:none; border-color:var(--accent); }
-      .dq-btn {
-        width:100%; padding:13px; border-radius:12px; border:none;
-        background:var(--accent); color:#fff; font-size:15px; cursor:pointer;
-        margin-bottom:10px;
-      }
-      .dq-btn:disabled { opacity:0.4; cursor:not-allowed; }
-      .dq-feedback { font-size:13px; line-height:1.5; min-height:20px; color:var(--ink-soft); font-style:italic; }
-      .dq-feedback.dq-ok { color:#4a8c5c; font-style:normal; font-weight:600; }
-      .dq-feedback.dq-wrong { color:var(--accent); }
-      .dq-result { text-align:center; padding:20px 0 10px; }
-      .dq-score { font-size:64px; font-weight:800; color:var(--accent); font-family:var(--sans); line-height:1; }
-      .dq-score span { font-size:28px; color:var(--ink-soft); }
-      .dq-result-msg { font-family:var(--serif); font-size:18px; line-height:1.6; color:var(--ink); margin:16px 0 8px; }
-      .dq-result-sub { font-size:13px; color:var(--ink-soft); }
-    `;
-    document.head.appendChild(s);
+    if(current>=questions.length){ saveState(); renderDatesResult(data,answers,dayNum); return; }
+    const q=questions[current];
+    root.innerHTML=`<div class="dq-progress">${current+1} / ${questions.length}</div><div class="dq-question">${q.question}</div><div style="display:flex;gap:8px;margin-bottom:10px;"><input id="dq-day" class="dq-input" style="width:70px;" type="number" placeholder="Jour" min="1" max="31"><input id="dq-month" class="dq-input" style="flex:1;" type="number" placeholder="Mois" min="1" max="12"></div><button class="dq-btn" id="dq-btn">Valider</button><div class="dq-feedback" id="dq-feedback"></div>`;
+    const dayIn=document.getElementById('dq-day'),monthIn=document.getElementById('dq-month'),btn=document.getElementById('dq-btn'),fb=document.getElementById('dq-feedback');
+    btn.addEventListener('click',()=>{
+      const d=parseInt(dayIn.value)||0,m=parseInt(monthIn.value)||0;
+      const targets=Array.isArray(q.answer)?q.answer:[q.answer];
+      const correct=targets.some(t=>t.day===d&&t.month===m);
+      answers.push({given:{day:d,month:m},correct}); saveState();
+      fb.textContent=correct?'✓ Bonne réponse !':(q.taquin||'Pas exactement...');
+      fb.className='dq-feedback '+(correct?'dq-ok':'dq-wrong');
+      btn.disabled=true;
+      setTimeout(()=>{ current++; saveState(); renderQuestion(); },1800);
+    });
+    [dayIn,monthIn].forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter') btn.click(); }));
   }
 
   renderQuestion();
+
+  if(!document.getElementById('dq-style')){
+    const s=document.createElement('style'); s.id='dq-style';
+    s.textContent=`#datesquiz-root{margin-top:22px;}.dq-progress{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink-soft);margin-bottom:14px;}.dq-question{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--ink);margin-bottom:16px;}.dq-input{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-size:16px;color:var(--ink);font-family:var(--sans);margin-bottom:10px;text-align:center;}.dq-input:focus{outline:none;border-color:var(--accent);}.dq-btn{width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;cursor:pointer;margin-bottom:10px;}.dq-btn:disabled{opacity:0.4;cursor:not-allowed;}.dq-feedback{font-size:13px;line-height:1.5;min-height:20px;color:var(--ink-soft);font-style:italic;}.dq-feedback.dq-ok{color:#4a8c5c;font-style:normal;font-weight:600;}.dq-feedback.dq-wrong{color:var(--accent);}.dq-result{text-align:center;padding:20px 0 10px;}.dq-score{font-size:64px;font-weight:800;color:var(--accent);font-family:var(--sans);line-height:1;}.dq-score span{font-size:28px;color:var(--ink-soft);}.dq-result-msg{font-family:var(--serif);font-size:18px;line-height:1.6;color:var(--ink);margin:16px 0 8px;}.dq-result-sub{font-size:13px;color:var(--ink-soft);}`;
+    document.head.appendChild(s);
+  }
+}
+
+function renderDatesResult(data, answers, dayNum){
+  const root=document.getElementById('datesquiz-root');
+  if(!root) return;
+  const score=answers.filter(a=>a.correct).length,total=answers.length;
+  let msg;
+  if(score===total) msg="Parfait. T'as tout juste. Je t'aime encore plus là.";
+  else if(score>=total*0.7) msg="Pas mal du tout. Y'a quelques trous mais t'as retenu l'essentiel.";
+  else if(score>=total*0.4) msg="Bof bof... on repassera les dates ensemble un jour.";
+  else msg="Aziyadé... t'as oublié nos dates. Je suis blessé. (non je rigole je t'aime)";
+  root.innerHTML=`<div class="dq-result"><div class="dq-score">${score}<span>/${total}</span></div><div class="dq-result-msg">${msg}</div><div class="dq-result-sub">Joyeux 6 mois ❤️</div></div><button class="btn-restart" onclick="restartDay(${dayNum},'datesquiz')">Recommencer ↺</button>`;
 }
 
 function closeDay(){
@@ -2774,20 +2593,51 @@ document.getElementById('pwd-form').addEventListener('submit', function(e){
 
 
 
-document.getElementById('pwd-form').addEventListener('submit', function(e){
-  e.preventDefault();
-  const val = document.getElementById('pwd-input').value.trim();
-  const errorEl = document.getElementById('pwd-error');
 
-  if(val === PASSWORD){
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    buildGrid();
-  } else {
-    errorEl.textContent = "Ce n'est pas la bonne date...";
-    document.getElementById('pwd-input').value = '';
+/* ============================================================
+   DayState — sauvegarde localStorage
+   ============================================================ */
+const DayState = {
+  save(day, data){ try{ localStorage.setItem('day_'+day, JSON.stringify(data)); }catch(e){} },
+  load(day){ try{ const v=localStorage.getItem('day_'+day); return v?JSON.parse(v):null; }catch(e){ return null; } },
+  clear(day){ try{ localStorage.removeItem('day_'+day); }catch(e){} }
+};
+
+function restartDay(dayNum, gameType){
+  DayState.clear(dayNum);
+  const data=CONTENT[dayNum];
+  if(!data) return;
+  const card=document.getElementById('content-card');
+  if(gameType==='memory'){
+    card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag">${TAG_LABELS.minigame}</div><div class="memory-intro">${data.text}</div><div id="memory-root"></div>`;
+    initMemoryGame(data,dayNum);
+  } else if(gameType==='puzzle'){
+    card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag">${TAG_LABELS.wordpuzzle}</div><div class="memory-intro">${data.text}</div><div id="puzzle-root"></div>`;
+    initWordPuzzle(data,dayNum);
+  } else if(gameType==='datesquiz'){
+    card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag">Petit quiz</div><div class="content-text">${data.intro}</div><div id="datesquiz-root" class="reveal"></div>`;
+    initDatesQuiz(data,dayNum);
   }
-});
+}
+
+/* Wrapped : sauvegarde slide courante */
+const _origInitWrapped = initWrapped;
+function initWrapped(data, dayNum){
+  _origInitWrapped(data);
+  const saved=DayState.load(dayNum);
+  const startSlide=(saved&&saved.type==='wrapped')?(saved.slide||0):0;
+  setTimeout(()=>{
+    if(startSlide>0){ const btn=document.getElementById('w-tap-next'); for(let i=0;i<startSlide;i++) if(btn) btn.click(); }
+    ['w-tap-next','w-tap-prev'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.addEventListener('click',()=>{
+        const active=document.querySelector('.wrapped-slide.active');
+        if(active){ DayState.save(dayNum,{type:'wrapped',slide:parseInt(active.id.replace('w-slide-',''))||0}); }
+      });
+    });
+  },300);
+}
+
 </script>
 
 </body>
