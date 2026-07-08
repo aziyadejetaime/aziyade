@@ -1,11 +1,12 @@
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>46 jours</title>
+<title>47 jours</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1488,7 +1489,7 @@
     <div class="lock-icon">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
     </div>
-    <h1>46 jours</h1>
+    <h1>47 jours</h1>
     <p>Pour ouvrir, il te faut une date.<br>Une date qu'on n'oublie pas.</p>
     <form id="pwd-form" autocomplete="off">
       <input type="text" id="pwd-input" inputmode="numeric" placeholder="________" maxlength="20">
@@ -1501,7 +1502,7 @@
   <div id="app">
     <header>
       <div class="eyebrow">8 juillet — 23 août</div>
-      <h1 class="title">46 jours</h1>
+      <h1 class="title">47 jours</h1>
     </header>
 
     <div class="progress-card">
@@ -1536,7 +1537,7 @@
 
 // Date du jour 1 (premiere journee sans se voir)
 const START_DATE = new Date(2026, 6, 9); // mois = index 0, donc 6 = juillet
-const TOTAL_DAYS = 46;
+const TOTAL_DAYS = 47;
 
 // Mot de passe attendu (chiffres uniquement). A remplacer par la vraie date.
 const PASSWORD = "09012026"; // date ou vous avez commence a vous parler
@@ -1705,8 +1706,8 @@ const CONTENT = {
     text: "Après la Comédie Française, on avait marché jusqu'aux quais.<br><br>Je me souviens plus exactement de quoi on parlait... mais je me souviens de la Seine, des lumières, et que j'avais sorti mon téléphone pour filmer.<br><br>J'avais retrouvé cette vidéo.",
     video: "images/day24.mp4"
   },
-  // ... continuer jusqu'a 46
-  46: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
+  // ... continuer jusqu'a 47
+  47: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
 
 const TAG_LABELS = {
@@ -1777,7 +1778,7 @@ function buildGrid(){
   if(unlocked === 0){
     progressText = "Pas encore commence";
   } else if(unlocked >= TOTAL_DAYS){
-    progressText = "<b>Les 46 jours</b> sont passes. On se retrouve.";
+    progressText = "<b>Les 47 jours</b> sont passes. On se retrouve.";
   } else {
     progressText = `<b>${unlocked}</b> jour${unlocked>1?'s':''} debloque${unlocked>1?'s':''}, <b>${TOTAL_DAYS-unlocked}</b> a venir`;
   }
