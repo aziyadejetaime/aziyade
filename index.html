@@ -2288,7 +2288,7 @@ function velibReveal(day){
   const data = CONTENT[day];
   const container = document.getElementById('velib-videos');
   const btns = document.querySelector('.velib-btns');
-  btns.innerHTML = '<p class="velib-answered">Nous aussi 🚲❤️</p>';
+  btns.innerHTML = '<p class="velib-answered">Moi aussiiiiiii 🚲❤️</p>';
   container.innerHTML = data.videos.map((url, i) => `
     <a href="${url}" target="_blank" class="velib-video-btn reveal" style="animation-delay:${i * 0.1}s;">
       ▶ Voir la vidéo ${data.videos.length > 1 ? i + 1 : ''}
