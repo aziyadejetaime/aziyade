@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1701,7 +1702,7 @@ const CONTENT = {
     image: "images/lego_day23.png",
     glb: "lego_day23.glb"
   },
-  24: {
+  8: {
     type: "jumpscare",
     text: "Après la Comédie Française, on avait marché jusqu'aux quais.<br><br>Je me souviens plus exactement de quoi on parlait... mais je me souviens de la Seine, des lumières, et que j'avais sorti mon téléphone pour filmer.<br><br>J'avais retrouvé cette vidéo.",
     video: "images/day24.mp4"
@@ -2288,7 +2289,7 @@ function velibReveal(day){
   const data = CONTENT[day];
   const container = document.getElementById('velib-videos');
   const btns = document.querySelector('.velib-btns');
-  btns.innerHTML = '<p class="velib-answered">Moi aussiiiiiii 🚲❤️</p>';
+  btns.innerHTML = '<p class="velib-answered">Nous aussi 🚲❤️</p>';
   container.innerHTML = data.videos.map((url, i) => `
     <a href="${url}" target="_blank" class="velib-video-btn reveal" style="animation-delay:${i * 0.1}s;">
       ▶ Voir la vidéo ${data.videos.length > 1 ? i + 1 : ''}
