@@ -442,6 +442,58 @@
     color: var(--ink);
     margin-bottom: 18px;
   }
+  .puzzlephoto-wrap{
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    aspect-ratio: 1242 / 2208;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--line);
+    touch-action: manipulation;
+  }
+  .puzzlephoto-piece{
+    background-image: var(--pz-img);
+    background-size: 400% 400%;
+    cursor: pointer;
+    transition: outline 0.15s, filter 0.15s, transform 0.15s;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+  }
+  .puzzlephoto-piece:hover{ filter: brightness(1.05); }
+  .puzzlephoto-piece.selected{
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+    transform: scale(0.96);
+    z-index: 2;
+  }
+  .puzzlephoto-hint{
+    text-align:center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+  }
+  .puzzlephoto-win-img{
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+  }
+  .puzzlephoto-win-text{
+    font-family: var(--serif);
+    font-size: 21px;
+    line-height: 1.6;
+    color: var(--accent);
+    text-align:center;
+    padding: 18px 4px 4px;
+  }
   .memory-grid{
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1728,6 +1780,13 @@ const CONTENT = {
       { src: "images/6.jpg", caption: "La preuve en images." }
     ]
   },
+  12: {
+    type: "puzzlephoto",
+    text: "Reconstitue la photo pour voir......",
+    image: "images/7.jpg",
+    size: 4,
+    winText: "Un trop beau coupleeeee"
+  },
   // ... continuer jusqu'a 47
   47: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
@@ -1745,7 +1804,8 @@ const TAG_LABELS = {
   wrapped: "Notre Wrapped",
   datesquiz: "Petit quiz",
   lego: "Nous deux en Lego 🧱",
-  jumpscare: "Un souvenir 🌙"
+  jumpscare: "Un souvenir 🌙",
+  puzzlephoto: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -1850,6 +1910,15 @@ function showDay(day){
       <div id="puzzle-root"></div>
     `;
     initWordPuzzle(data, day);
+  } else if(data.type === 'puzzlephoto'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.puzzlephoto}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="puzzlephoto-root"></div>
+    `;
+    initPuzzlePhoto(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2095,6 +2164,92 @@ function initWordPuzzle(data, dayNum){
 function showPuzzleWin(data, dayNum){
   const card=document.getElementById('content-card');
   card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.wordpuzzle}</div><div class="puzzle-win-text reveal" style="animation-delay:0.1s;">${data.winText}</div><button class="btn-restart reveal" style="animation-delay:0.2s;" onclick="restartDay(${dayNum},'puzzle')">Recommencer ↺</button>`;
+}
+
+/* ---------- PUZZLE PHOTO ---------- */
+function initPuzzlePhoto(data, dayNum){
+  const N = data.size || 4;
+  const total = N * N;
+  const root = document.getElementById('puzzlephoto-root');
+  let saved = DayState.load(dayNum);
+  let order, state;
+
+  function shuffledOrder(){
+    let arr;
+    do {
+      arr = [...Array(total).keys()];
+      for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    } while(arr.every((v,i)=>v===i));
+    return arr;
+  }
+
+  if(saved && saved.type==='puzzlephoto' && saved.order){
+    order = saved.order; state = saved.state || 'playing';
+  } else {
+    order = shuffledOrder(); state = 'playing';
+    DayState.save(dayNum, {type:'puzzlephoto', order, state:'playing'});
+  }
+
+  if(state === 'won'){ showPuzzlePhotoWin(data, dayNum); return; }
+
+  root.innerHTML = `<div class="puzzlephoto-wrap" id="puzzlephoto-wrap" style="--pz-img:url('${data.image}')"></div><div class="puzzlephoto-hint">Touche deux pieces pour les echanger</div>`;
+  const wrap = document.getElementById('puzzlephoto-wrap');
+
+  let selected = null;
+
+  function bgPos(pieceIndex){
+    const col = pieceIndex % N, row = Math.floor(pieceIndex / N);
+    const pct = 100 / (N - 1);
+    return `${col*pct}% ${row*pct}%`;
+  }
+
+  function render(){
+    wrap.innerHTML = '';
+    order.forEach((pieceIndex, slot) => {
+      const el = document.createElement('div');
+      el.className = 'puzzlephoto-piece';
+      el.style.backgroundPosition = bgPos(pieceIndex);
+      el.dataset.slot = slot;
+      el.addEventListener('click', () => onPieceClick(slot));
+      wrap.appendChild(el);
+    });
+  }
+
+  function onPieceClick(slot){
+    if(selected === null){
+      selected = slot;
+      wrap.children[slot].classList.add('selected');
+      return;
+    }
+    if(selected === slot){
+      wrap.children[slot].classList.remove('selected');
+      selected = null;
+      return;
+    }
+    [order[selected], order[slot]] = [order[slot], order[selected]];
+    wrap.children[selected].classList.remove('selected');
+    selected = null;
+    render();
+    DayState.save(dayNum, {type:'puzzlephoto', order, state:'playing'});
+    if(order.every((v,i)=>v===i)){
+      DayState.save(dayNum, {type:'puzzlephoto', order, state:'won'});
+      setTimeout(() => showPuzzlePhotoWin(data, dayNum), 350);
+    }
+  }
+
+  render();
+}
+
+function showPuzzlePhotoWin(data, dayNum){
+  const card = document.getElementById('content-card');
+  card.innerHTML = `
+    <div class="drag-handle"></div>
+    <div class="close-card" onclick="closeDay()">&times;</div>
+    <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.puzzlephoto}</div>
+    <img src="${data.image}" alt="Nous deux" class="puzzlephoto-win-img reveal lightbox-trigger" style="animation-delay:0.1s;" data-src="${data.image}" data-caption="Aziyadé &amp; Mathurin">
+    <div class="puzzlephoto-win-text reveal" style="animation-delay:0.25s;">${data.winText}</div>
+    <button class="btn-restart reveal" style="animation-delay:0.35s;" onclick="restartDay(${dayNum},'puzzlephoto')">Recommencer ↺</button>
+  `;
 }
 
 /* ---------- RAPPORT OFFICIEL ---------- */
@@ -2980,6 +3135,9 @@ function restartDay(dayNum, gameType){
   } else if(gameType==='datesquiz'){
     card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag">Petit quiz</div><div class="content-text">${data.intro}</div><div id="datesquiz-root" class="reveal"></div>`;
     initDatesQuiz(data,dayNum);
+  } else if(gameType==='puzzlephoto'){
+    card.innerHTML=`<div class="drag-handle"></div><div class="close-card" onclick="closeDay()">&times;</div><div class="content-tag">${TAG_LABELS.puzzlephoto}</div><div class="memory-intro">${data.text}</div><div id="puzzlephoto-root"></div>`;
+    initPuzzlePhoto(data,dayNum);
   }
 }
 
