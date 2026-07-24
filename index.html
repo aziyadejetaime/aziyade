@@ -359,6 +359,73 @@
     z-index: 101;
   }
 
+  /* ---------- BOARDING PASS (avion) ---------- */
+  .bp-ticket{
+    background: linear-gradient(160deg, #eef6fb 0%, #ffffff 60%);
+    border: 1px solid #cfe4f2;
+    border-radius: 16px;
+    padding: 22px 20px;
+    position: relative;
+  }
+  .bp-plane-corner{
+    position: absolute;
+    top: 16px; right: 18px;
+    font-size: 20px;
+    opacity: 0.6;
+  }
+  .bp-row{
+    display:flex; justify-content:space-between; gap:12px;
+    margin-bottom: 14px;
+  }
+  .bp-field{ flex:1; }
+  .bp-label{
+    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #8fb2c9; margin-bottom: 3px; font-family: var(--sans);
+  }
+  .bp-value{
+    font-size: 15px; font-weight: 600; color: #22485f;
+    font-family: var(--sans);
+  }
+  .bp-cities{
+    display:flex; align-items:center; justify-content:space-between;
+    margin: 16px 0 6px;
+  }
+  .bp-city{ text-align:center; }
+  .bp-city-code{ font-size: 26px; font-weight: 700; color: #22485f; letter-spacing: 1px; }
+  .bp-city-name{ font-size: 11px; color: #8fb2c9; margin-top: 2px; }
+  .bp-arrow{ font-size: 18px; color: #a9c9dc; }
+  .bp-dashed{
+    border-top: 2px dashed #cfe4f2;
+    margin: 18px 0;
+    position: relative;
+  }
+  .bp-dashed::before, .bp-dashed::after{
+    content:''; position:absolute; top:-9px; width:18px; height:18px;
+    border-radius:50%; background: var(--card);
+  }
+  .bp-dashed::before{ left:-30px; }
+  .bp-dashed::after{ right:-30px; }
+  .bp-btn{
+    display:block; width:100%; margin-top: 4px; padding: 13px;
+    border-radius: 12px; border:none;
+    background: linear-gradient(135deg, #7ea9c9, #5c8fb5);
+    color:#fff; font-size: 14px; font-weight:600;
+    font-family: var(--sans); cursor:pointer;
+    box-shadow: 0 6px 16px rgba(92,143,181,0.3);
+  }
+  .bp-btn:hover{ filter: brightness(1.05); }
+  .bp-tracker{ margin-top: 22px; text-align:center; }
+  .bp-tracker-caption{
+    font-size: 11px; color: #8fb2c9; margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+  .bp-wintext{
+    font-family: var(--serif);
+    font-size: 18px; line-height:1.65;
+    color: var(--ink); text-align:center;
+    margin-top: 22px;
+  }
+
   /* ---------- WORD PUZZLE (glisser-deposer) ---------- */
   .puzzle-slots{
     display:flex; flex-wrap:wrap;
@@ -942,7 +1009,7 @@
     white-space: nowrap;
     font-family: sans-serif;
   }
-  /* ---------- WRAPPED (jour 14) ---------- */
+  /* ---------- WRAPPED (jour 20) ---------- */
   .wrapped-shell{
     position: relative;
     background: #0d0d0d;
@@ -1680,7 +1747,7 @@ const CONTENT = {
       "https://youtube.com/shorts/IPTO817HI-M?feature=share"
     ]
   },
-  14: {
+  20: {
     type: "wrapped",
     slides: [
       { id: "intro" },
@@ -1692,6 +1759,21 @@ const CONTENT = {
       { id: "premier" },
       { id: "finale" }
     ]
+  },
+  13: { type: "together", text: "On etait ensemble ❤️" },
+  14: { type: "together", text: "On etait ensemble ❤️" },
+  15: { type: "together", text: "On etait ensemble ❤️" },
+  16: { type: "together", text: "On etait ensemble ❤️" },
+  17: {
+    type: "boardingpass",
+    passenger: "AZIYADE",
+    date: "24 JUILLET 2026",
+    flight: "AZ 0901",
+    gate: "B12",
+    seat: "12A",
+    from: { code: "CDG", city: "Paris" },
+    to: { code: "CHQ", city: "Chania" },
+    winText: "Embarquement immédiat pour la Grèce. Bagages : mon linge de rechange et le manque de toi ❤️❤️"
   },
   6: {
     type: "datesquiz",
@@ -1805,7 +1887,9 @@ const TAG_LABELS = {
   datesquiz: "Petit quiz",
   lego: "Nous deux en Lego 🧱",
   jumpscare: "Un souvenir 🌙",
-  puzzlephoto: "Petit jeu"
+  puzzlephoto: "Petit jeu",
+  together: "On etait ensemble ❤️",
+  boardingpass: "Embarquement ✈️"
 };
 
 /* ==================================================== */
@@ -1919,6 +2003,14 @@ function showDay(day){
       <div id="puzzlephoto-root"></div>
     `;
     initPuzzlePhoto(data, day);
+  } else if(data.type === 'boardingpass'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.boardingpass}</div>
+      <div id="boardingpass-root"></div>
+    `;
+    initBoardingPass(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2252,6 +2344,99 @@ function showPuzzlePhotoWin(data, dayNum){
   `;
 }
 
+/* ---------- BOARDING PASS ---------- */
+function initBoardingPass(data, dayNum){
+  const root = document.getElementById('boardingpass-root');
+  const saved = DayState.load(dayNum);
+  const boarded = saved && saved.type === 'boardingpass' && saved.boarded;
+
+  function ticketHTML(){
+    return `
+      <div class="bp-ticket">
+        <div class="bp-plane-corner">✈️</div>
+        <div class="bp-row">
+          <div class="bp-field">
+            <div class="bp-label">Passagere</div>
+            <div class="bp-value">${data.passenger}</div>
+          </div>
+          <div class="bp-field">
+            <div class="bp-label">Date</div>
+            <div class="bp-value">${data.date}</div>
+          </div>
+        </div>
+        <div class="bp-cities">
+          <div class="bp-city">
+            <div class="bp-city-code">${data.from.code}</div>
+            <div class="bp-city-name">${data.from.city}</div>
+          </div>
+          <div class="bp-arrow">✈️ ⟶</div>
+          <div class="bp-city">
+            <div class="bp-city-code">${data.to.code}</div>
+            <div class="bp-city-name">${data.to.city}</div>
+          </div>
+        </div>
+        <div class="bp-dashed"></div>
+        <div class="bp-row">
+          <div class="bp-field">
+            <div class="bp-label">Vol</div>
+            <div class="bp-value">${data.flight}</div>
+          </div>
+          <div class="bp-field">
+            <div class="bp-label">Porte</div>
+            <div class="bp-value">${data.gate}</div>
+          </div>
+          <div class="bp-field">
+            <div class="bp-label">Siege</div>
+            <div class="bp-value">${data.seat}</div>
+          </div>
+        </div>
+        ${boarded ? '' : `<button class="bp-btn" id="bp-board-btn">Embarquer ✈️</button>`}
+      </div>
+      <div class="bp-tracker" id="bp-tracker" style="${boarded ? '' : 'display:none;'}">
+        <svg viewBox="0 0 300 110" width="100%" style="max-width:320px;">
+          <path id="bp-path" d="M 25 85 Q 150 10 275 45" fill="none" stroke="#cfe4f2" stroke-width="2" stroke-dasharray="4 5"/>
+          <circle cx="25" cy="85" r="5" fill="#5c8fb5"/>
+          <circle cx="275" cy="45" r="5" fill="#5c8fb5"/>
+          <text x="25" y="102" text-anchor="middle" font-size="10" fill="#8fb2c9">${data.from.code}</text>
+          <text x="275" y="62" text-anchor="middle" font-size="10" fill="#8fb2c9">${data.to.code}</text>
+          <text x="0" y="0" font-size="16" text-anchor="middle">
+            ✈️
+            ${boarded ? '' : `<animateMotion dur="2.2s" begin="indefinite" fill="freeze" rotate="auto" path="M 25 85 Q 150 10 275 45"/>`}
+          </text>
+        </svg>
+        <div class="bp-tracker-caption">${boarded ? 'Vol termine' : 'En vol vers ' + data.to.city + '...'}</div>
+      </div>
+      <div class="bp-wintext ${boarded ? '' : 'reveal'}" id="bp-wintext" style="${boarded ? '' : 'display:none;'}">${data.winText}</div>
+    `;
+  }
+
+  root.innerHTML = ticketHTML();
+
+  if(boarded){
+    const svgText = root.querySelector('#bp-tracker text');
+    if(svgText){ svgText.setAttribute('x','275'); svgText.setAttribute('y','45'); }
+    return;
+  }
+
+  const btn = document.getElementById('bp-board-btn');
+  btn.addEventListener('click', () => {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    document.getElementById('bp-tracker').style.display = 'block';
+    const motionEl = root.querySelector('animateMotion');
+    if(motionEl && motionEl.beginElement){
+      try{ motionEl.beginElement(); }catch(e){}
+    }
+    setTimeout(() => {
+      DayState.save(dayNum, {type:'boardingpass', boarded:true});
+      const wintext = document.getElementById('bp-wintext');
+      wintext.style.display = 'block';
+      const caption = root.querySelector('.bp-tracker-caption');
+      if(caption) caption.textContent = 'Vol termine';
+    }, 2300);
+  });
+}
+
 /* ---------- RAPPORT OFFICIEL ---------- */
 function initRapport(data){
   const root = document.getElementById('rapport-root');
@@ -2477,7 +2662,7 @@ function velibNo(){
   btns.innerHTML = '<p class="velib-answered">Moi oui en tout cas 🚲</p>';
 }
 
-/* ---------- WRAPPED (jour 14) ---------- */
+/* ---------- WRAPPED (jour 20) ---------- */
 function initWrapped(data){
   const root = document.getElementById('wrapped-root');
   const TOTAL = data.slides.length;
