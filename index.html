@@ -359,6 +359,105 @@
     z-index: 101;
   }
 
+  /* ---------- ROUE DE L'AMOUR ---------- */
+  .wheel-wrap{
+    display:flex; flex-direction:column; align-items:center;
+    margin: 10px 0 8px; position:relative;
+  }
+  .wheel-pointer{
+    width:0; height:0;
+    border-left:11px solid transparent;
+    border-right:11px solid transparent;
+    border-top:18px solid var(--accent);
+    margin-bottom:-8px; z-index:3;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+    transform-origin: top center;
+  }
+  .wheel-pointer.tick{ animation: pointerTick 0.35s ease; }
+  @keyframes pointerTick{
+    0%{ transform: rotate(0deg); }
+    35%{ transform: rotate(-14deg); }
+    65%{ transform: rotate(8deg); }
+    100%{ transform: rotate(0deg); }
+  }
+  .wheel-outer{
+    position:relative; width:230px; height:230px;
+    padding: 7px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #ffffff, var(--accent-soft));
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08) inset, 0 14px 30px rgba(0,0,0,0.16);
+  }
+  .wheel{
+    width:100%; height:100%; border-radius:50%;
+    border: 5px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15) inset, 0 10px 26px rgba(0,0,0,0.18);
+    transition: transform 3s cubic-bezier(0.21,0.71,0.1,1);
+    background:
+      repeating-conic-gradient(from 0deg, rgba(255,255,255,0.55) 0deg 0.6deg, transparent 0.6deg 45deg),
+      conic-gradient(
+        var(--accent) 0deg 45deg,
+        #fff6f8 45deg 90deg,
+        var(--accent-soft) 90deg 135deg,
+        #fff6f8 135deg 180deg,
+        var(--accent) 180deg 225deg,
+        #fff6f8 225deg 270deg,
+        var(--accent-soft) 270deg 315deg,
+        #fff6f8 315deg 360deg
+      );
+  }
+  .wheel-center-dot{
+    position:absolute; top:50%; left:50%;
+    width:22px; height:22px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--accent) 70%);
+    transform: translate(-50%,-50%);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25), 0 0 0 4px #fff;
+    z-index: 2;
+  }
+  .wheel-btn{
+    display:block; margin-top: 22px; padding: 13px 30px;
+    border-radius: 14px; border:none;
+    background: linear-gradient(135deg, var(--accent), #c46f90);
+    color:#fff; font-size: 14px; font-weight:600;
+    font-family: var(--sans); cursor:pointer;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: wheelBtnPulse 2.2s ease-in-out infinite;
+  }
+  .wheel-btn:hover{ transform: translateY(-1px) scale(1.03); box-shadow: 0 10px 22px rgba(0,0,0,0.22); }
+  .wheel-btn:active{ transform: translateY(1px) scale(0.97); }
+  @keyframes wheelBtnPulse{
+    0%,100%{ box-shadow: 0 8px 18px rgba(0,0,0,0.18); }
+    50%{ box-shadow: 0 8px 22px rgba(217,139,168,0.45); }
+  }
+  .wheel-result-wrap{
+    position: relative;
+    margin-top: 26px;
+    min-height: 20px;
+  }
+  .wheel-result{
+    font-family: var(--serif);
+    font-size: 19px; line-height:1.6;
+    color: var(--ink); text-align:center;
+    opacity: 0; transform: translateY(8px) scale(0.97);
+  }
+  .wheel-result.show{
+    animation: wheelResultIn 0.6s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+  @keyframes wheelResultIn{
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+  .wheel-heart{
+    position:absolute; bottom: 0; left: 50%;
+    font-size: 15px; opacity:0;
+    pointer-events:none;
+    animation: wheelHeartFloat 1.6s ease-out forwards;
+  }
+  @keyframes wheelHeartFloat{
+    0%{ opacity:0; transform: translate(-50%,0) scale(0.6); }
+    15%{ opacity:1; }
+    100%{ opacity:0; transform: translate(calc(-50% + var(--hx,0px)), -70px) scale(1.1) rotate(var(--hr,0deg)); }
+  }
+
   /* ---------- BOARDING PASS (avion) ---------- */
   .bp-ticket{
     background: linear-gradient(160deg, #eef6fb 0%, #ffffff 60%);
@@ -1775,6 +1874,20 @@ const CONTENT = {
     to: { code: "CHQ", city: "Chania" },
     winText: "Embarquement immédiat pour la Grèce. Bagages : mon linge de rechange et le manque de toi ❤️❤️"
   },
+  18: {
+    type: "lovewheel",
+    text: "Une petite roue, plein de raisons de t'aimer. Tourne-la.",
+    items: [
+      "Ton rire qui se declenche pour rien",
+      "Ta facon de me comprendre",
+      "Ces regards qui durent trop longtemps",
+      "Comment tu prends soin de moi sans le dire",
+      "Nos silences jamais genants",
+      "Juste ta patience avec moi",
+      "Ta manie de voler la derniere bouchee dans mon assiette",
+      "Le fait que tu sois toi, tout simplement"
+    ]
+  },
   6: {
     type: "datesquiz",
     intro: "Aujourd'hui ça fait 5 mois et 1 jour qu'on est ensemble.<br><br>Mais t'as bonne mémoire sur le reste ? On va voir ça.",
@@ -1889,7 +2002,8 @@ const TAG_LABELS = {
   jumpscare: "Un souvenir 🌙",
   puzzlephoto: "Petit jeu",
   together: "On etait ensemble ❤️",
-  boardingpass: "Embarquement ✈️"
+  boardingpass: "Embarquement ✈️",
+  lovewheel: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -2011,6 +2125,15 @@ function showDay(day){
       <div id="boardingpass-root"></div>
     `;
     initBoardingPass(data, day);
+  } else if(data.type === 'lovewheel'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.lovewheel}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="lovewheel-root"></div>
+    `;
+    initLoveWheel(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2434,6 +2557,94 @@ function initBoardingPass(data, dayNum){
       const caption = root.querySelector('.bp-tracker-caption');
       if(caption) caption.textContent = 'Vol termine';
     }, 2300);
+  });
+}
+
+/* ---------- ROUE DE L'AMOUR ---------- */
+function initLoveWheel(data, dayNum){
+  const root = document.getElementById('lovewheel-root');
+  const items = data.items;
+  const N = items.length;
+  const seg = 360 / N;
+  const saved = DayState.load(dayNum);
+  let spun = false, chosenIndex = null, finalRotation = 0;
+
+  if(saved && saved.type === 'lovewheel' && typeof saved.index === 'number'){
+    spun = true; chosenIndex = saved.index; finalRotation = saved.rotation || 0;
+  }
+
+  let current = finalRotation;
+
+  function heartsHTML(){
+    const hearts = ['❤️','💗','💕'];
+    return hearts.map((h,i) => {
+      const hx = (i - 1) * 26 + (Math.random()*10 - 5);
+      const hr = (Math.random()*30 - 15).toFixed(0);
+      const delay = (i * 0.12).toFixed(2);
+      return `<span class="wheel-heart" style="--hx:${hx}px; --hr:${hr}deg; animation-delay:${delay}s;">${h}</span>`;
+    }).join('');
+  }
+
+  root.innerHTML = `
+    <div class="wheel-wrap">
+      <div class="wheel-pointer" id="wheel-pointer"></div>
+      <div class="wheel-outer">
+        <div class="wheel" id="love-wheel" style="transform:rotate(${finalRotation}deg)"></div>
+        <div class="wheel-center-dot"></div>
+      </div>
+      <button class="wheel-btn" id="wheel-spin-btn">${spun ? 'Tourner à nouveau ↺' : 'Tourner la roue 🎡'}</button>
+    </div>
+    <div class="wheel-result-wrap">
+      <div class="wheel-result ${spun ? 'show' : ''}" id="wheel-result">${spun ? items[chosenIndex] : ''}</div>
+      <div id="wheel-hearts-slot"></div>
+    </div>
+  `;
+
+  const btn = document.getElementById('wheel-spin-btn');
+  const wheelEl = document.getElementById('love-wheel');
+  const pointerEl = document.getElementById('wheel-pointer');
+  const resultEl = document.getElementById('wheel-result');
+  const heartsSlot = document.getElementById('wheel-hearts-slot');
+
+  btn.addEventListener('click', function(){
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.animation = 'none';
+    resultEl.classList.remove('show');
+    heartsSlot.innerHTML = '';
+
+    const idx = Math.floor(Math.random() * N);
+    const targetCenter = idx * seg + seg / 2;
+    const spins = 5;
+    // base toujours superieur a la position actuelle, pour ne jamais tourner en arriere
+    const baseRotation = Math.floor(current / 360) * 360 + spins * 360 + (360 - targetCenter);
+    const overshoot = baseRotation + 10;
+
+    // Phase 1 : grande accélération/décélération, léger dépassement
+    wheelEl.style.transition = 'transform 2.7s cubic-bezier(0.15,0.75,0.05,1)';
+    wheelEl.style.transform = `rotate(${overshoot}deg)`;
+
+    const onPhase1End = (e) => {
+      if(e.propertyName !== 'transform') return;
+      wheelEl.removeEventListener('transitionend', onPhase1End);
+      // Phase 2 : petit rebond de retour, effet elastique
+      wheelEl.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+      wheelEl.style.transform = `rotate(${baseRotation}deg)`;
+      pointerEl.classList.add('tick');
+      setTimeout(() => pointerEl.classList.remove('tick'), 400);
+
+      setTimeout(() => {
+        current = baseRotation;
+        DayState.save(dayNum, {type:'lovewheel', index: idx, rotation: baseRotation % 360});
+        resultEl.textContent = items[idx];
+        resultEl.classList.add('show');
+        heartsSlot.innerHTML = heartsHTML();
+        btn.disabled = false;
+        btn.style.opacity = '';
+        btn.textContent = 'Tourner à nouveau ↺';
+      }, 250);
+    };
+    wheelEl.addEventListener('transitionend', onPhase1End);
   });
 }
 
