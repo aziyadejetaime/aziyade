@@ -660,6 +660,67 @@
     text-align:center;
     padding: 18px 4px 4px;
   }
+
+  /* ---------- ATTRAPE-COEURS ---------- */
+  .heartcatch-hud{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 10px; padding: 0 2px;
+  }
+  .heartcatch-lives{ display:flex; gap:4px; font-size:17px; }
+  .heartcatch-life{ opacity:1; transition: opacity 0.3s, transform 0.3s; }
+  .heartcatch-life.lost{ opacity:0.25; transform: scale(0.85); }
+  .heartcatch-score{
+    font-family: var(--sans); font-size:13px; font-weight:600;
+    color: var(--ink-soft);
+    background: var(--accent-soft); padding: 4px 12px; border-radius: 20px;
+  }
+  .heartcatch-area{
+    position:relative; width:100%; height:260px;
+    overflow:hidden; border-radius:16px;
+    background: linear-gradient(180deg, var(--accent-soft), #ffffff);
+    border: 1px solid var(--line);
+    touch-action: manipulation;
+  }
+  .heartcatch-heart{
+    position:absolute; top:-40px;
+    width: 48px; height:48px;
+    margin-left: -24px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 27px; line-height:1; cursor:pointer;
+    user-select:none;
+    animation-name: heartcatchFall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    will-change: transform;
+  }
+  @keyframes heartcatchFall{
+    from{ transform: translateY(-40px); }
+    to{ transform: translateY(var(--fall-dist,300px)); }
+  }
+  .heartcatch-heart.caught{
+    animation: none !important;
+    transition: transform 0.3s, opacity 0.3s;
+    transform: scale(1.6) !important;
+    opacity: 0 !important;
+    pointer-events:none;
+  }
+  .heartcatch-toast{
+    position:absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    background: rgba(255,255,255,0.94);
+    border-radius: 14px; padding: 12px 20px;
+    font-family: var(--serif); font-size: 15px; color: var(--ink);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    text-align:center; z-index: 5;
+    animation: toastPop 0.25s ease;
+  }
+  @keyframes toastPop{ from{ opacity:0; transform: translate(-50%,-50%) scale(0.85); } to{ opacity:1; transform: translate(-50%,-50%) scale(1); } }
+  .heartcatch-wintext{
+    font-family: var(--serif); font-size: 19px; line-height:1.6;
+    color: var(--ink); text-align:center;
+    margin-top: 20px;
+  }
+
   .memory-grid{
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1878,15 +1939,21 @@ const CONTENT = {
     type: "lovewheel",
     text: "Une petite roue, plein de raisons de t'aimer. Tourne-la.",
     items: [
-      "Ton rire qui se declenche pour rien ❤️❤️",
-      "Ta facon de me comprendre ❤️❤️",
-      "Ces regards qui durent longtemps ❤️❤️",
-      "Comment tu prends soin de moi ❤️❤️",
-      "Nos silences jamais genants ❤️❤️",
-      "Ta patience avec moi ❤️❤️",
-      "Cette petite tête quand tu boudes ❤️❤️",
-      "Le fait que tu sois toi, tout simplement ❤️❤️"
+      "Ton rire qui se declenche pour rien",
+      "Ta facon de me comprendre",
+      "Ces regards qui durent trop longtemps",
+      "Comment tu prends soin de moi sans le dire",
+      "Nos silences jamais genants",
+      "Juste ta patience avec moi",
+      "Ta manie de voler la derniere bouchee dans mon assiette",
+      "Le fait que tu sois toi, tout simplement"
     ]
+  },
+  19: {
+    type: "heartcatch",
+    text: "Attrape les cœurs ❤️, evite les cœurs brises 💔 — tu as 3 vies.",
+    target: 12,
+    winText: "Tu as attrapé autant de cœurs que de raisons de t'aimer, je t'aime fort."
   },
   6: {
     type: "datesquiz",
@@ -2003,7 +2070,8 @@ const TAG_LABELS = {
   puzzlephoto: "Petit jeu",
   together: "On etait ensemble ❤️",
   boardingpass: "Embarquement ✈️",
-  lovewheel: "Petit jeu"
+  lovewheel: "Petit jeu",
+  heartcatch: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -2134,6 +2202,15 @@ function showDay(day){
       <div id="lovewheel-root"></div>
     `;
     initLoveWheel(data, day);
+  } else if(data.type === 'heartcatch'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.heartcatch}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="heartcatch-root"></div>
+    `;
+    initHeartCatch(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2646,6 +2723,122 @@ function initLoveWheel(data, dayNum){
     };
     wheelEl.addEventListener('transitionend', onPhase1End);
   });
+}
+
+/* ---------- ATTRAPE-COEURS ---------- */
+function initHeartCatch(data, dayNum){
+  const root = document.getElementById('heartcatch-root');
+  const target = data.target || 12;
+  const saved = DayState.load(dayNum);
+  const alreadyWon = saved && saved.type === 'heartcatch' && saved.won;
+
+  function renderWin(){
+    root.innerHTML = `
+      <div class="heartcatch-wintext reveal" style="animation-delay:0.05s;">${data.winText}</div>
+      <button class="btn-restart reveal" style="animation-delay:0.15s;" id="hc-replay-btn">Rejouer ↺</button>
+    `;
+    document.getElementById('hc-replay-btn').addEventListener('click', () => {
+      DayState.clear(dayNum);
+      startGame();
+    });
+  }
+
+  function startGame(){
+    let score = 0;
+    let lives = 3;
+    let running = true;
+    let spawnTimer = null;
+    const activeHearts = new Set();
+    const GOOD = ['❤️','💗','💕','💖'];
+
+    root.innerHTML = `
+      <div class="heartcatch-hud">
+        <div class="heartcatch-lives" id="hc-lives">
+          <span class="heartcatch-life">❤️</span><span class="heartcatch-life">❤️</span><span class="heartcatch-life">❤️</span>
+        </div>
+        <div class="heartcatch-score" id="hc-score">0 / ${target}</div>
+      </div>
+      <div class="heartcatch-area" id="hc-area"></div>
+    `;
+
+    const area = document.getElementById('hc-area');
+    const scoreEl = document.getElementById('hc-score');
+    const livesEls = Array.from(document.querySelectorAll('#hc-lives .heartcatch-life'));
+
+    function updateHud(){
+      scoreEl.textContent = `${score} / ${target}`;
+      livesEls.forEach((el, i) => el.classList.toggle('lost', i >= lives));
+    }
+
+    function showToast(msg){
+      const toast = document.createElement('div');
+      toast.className = 'heartcatch-toast';
+      toast.textContent = msg;
+      area.appendChild(toast);
+      setTimeout(() => toast.remove(), 1100);
+    }
+
+    function spawnHeart(){
+      if(!running) return;
+      const isBroken = Math.random() < 0.32;
+      const el = document.createElement('div');
+      el.className = 'heartcatch-heart';
+      el.textContent = isBroken ? '💔' : GOOD[Math.floor(Math.random()*GOOD.length)];
+      el.dataset.type = isBroken ? 'broken' : 'good';
+      const left = 8 + Math.random() * 78;
+      const duration = 2.6 + Math.random() * 1.2;
+      const fallDist = area.clientHeight + 80;
+      el.style.left = left + '%';
+      el.style.setProperty('--fall-dist', fallDist + 'px');
+      el.style.animationDuration = duration + 's';
+
+      const onEnd = () => { activeHearts.delete(el); el.remove(); };
+      el.addEventListener('animationend', onEnd);
+
+      el.addEventListener('click', () => {
+        if(!running || el.classList.contains('caught')) return;
+        el.classList.add('caught');
+        activeHearts.delete(el);
+        setTimeout(() => el.remove(), 320);
+
+        if(isBroken){
+          lives--;
+          updateHud();
+          if(lives <= 0){
+            running = false;
+            clearInterval(spawnTimer);
+            activeHearts.forEach(h => h.remove());
+            activeHearts.clear();
+            showToast('Aïe... on recommence ❤️‍🩹');
+            setTimeout(() => { score = 0; lives = 3; running = true; runLoop(); }, 1000);
+          }
+        } else {
+          score++;
+          updateHud();
+          if(score >= target){
+            running = false;
+            clearInterval(spawnTimer);
+            activeHearts.forEach(h => h.remove());
+            activeHearts.clear();
+            DayState.save(dayNum, {type:'heartcatch', won:true});
+            setTimeout(renderWin, 350);
+          }
+        }
+      });
+
+      area.appendChild(el);
+      activeHearts.add(el);
+    }
+
+    function runLoop(){
+      updateHud();
+      spawnTimer = setInterval(spawnHeart, 650);
+    }
+    runLoop();
+  }
+
+  if(alreadyWon){ renderWin(); return; }
+  startGame();
 }
 
 /* ---------- RAPPORT OFFICIEL ---------- */
