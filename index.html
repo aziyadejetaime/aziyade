@@ -721,6 +721,88 @@
     margin-top: 20px;
   }
 
+  /* ---------- MACHINE A SOUS ---------- */
+  .slot-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .slot-machine{
+    background: linear-gradient(160deg, #fff, var(--accent-soft));
+    border-radius: 20px;
+    padding: 20px 18px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08) inset, 0 14px 30px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 300px;
+  }
+  .slot-reels{
+    display:flex; gap: 8px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12) inset;
+  }
+  .slot-reel{
+    flex:1; height: 68px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 32px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    overflow:hidden;
+  }
+  .slot-reel.spinning{
+    animation: slotFlicker 0.09s linear infinite;
+    filter: blur(1.5px);
+  }
+  @keyframes slotFlicker{
+    0%{ transform: translateY(-2px); }
+    50%{ transform: translateY(2px); }
+    100%{ transform: translateY(-2px); }
+  }
+  .slot-reel.landed{
+    animation: slotLand 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes slotLand{
+    0%{ transform: scale(1.25); }
+    100%{ transform: scale(1); }
+  }
+  .slot-btn{
+    display:block; margin-top: 18px; padding: 13px 30px;
+    border-radius: 14px; border:none;
+    background: linear-gradient(135deg, var(--accent), #c46f90);
+    color:#fff; font-size: 14px; font-weight:600;
+    font-family: var(--sans); cursor:pointer;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    transition: transform 0.15s;
+  }
+  .slot-btn:hover{ transform: translateY(-1px) scale(1.03); }
+  .slot-btn:active{ transform: translateY(1px) scale(0.97); }
+  .slot-btn:disabled{ opacity:0.55; cursor:default; transform:none; }
+  .slot-result{
+    margin-top: 20px; min-height: 20px;
+    font-family: var(--serif); font-size: 18px; line-height:1.6;
+    color: var(--ink); text-align:center;
+    opacity:0; transform: translateY(6px);
+  }
+  .slot-result.show{ animation: slotResultIn 0.5s ease forwards; }
+  @keyframes slotResultIn{ to{ opacity:1; transform: translateY(0); } }
+  .slot-result.miss{ color: var(--ink-soft); font-family: var(--sans); font-size:14px; }
+
+  .slot-hearts-overlay{
+    position:absolute; inset:0;
+    pointer-events:none; overflow:hidden;
+    z-index: 50;
+  }
+  .slot-flying-heart{
+    position:absolute; bottom:-30px;
+    font-size: 20px;
+    animation-name: slotHeartRise;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+  }
+  @keyframes slotHeartRise{
+    0%{ opacity:0; transform: translateY(0) translateX(0) rotate(0deg); }
+    10%{ opacity:1; }
+    100%{ opacity:0; transform: translateY(-420px) translateX(var(--hx,0px)) rotate(var(--hr,0deg)); }
+  }
+
   .memory-grid{
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1169,7 +1251,7 @@
     white-space: nowrap;
     font-family: sans-serif;
   }
-  /* ---------- WRAPPED (jour 20) ---------- */
+  /* ---------- WRAPPED (jour 30) ---------- */
   .wrapped-shell{
     position: relative;
     background: #0d0d0d;
@@ -1907,7 +1989,7 @@ const CONTENT = {
       "https://youtube.com/shorts/IPTO817HI-M?feature=share"
     ]
   },
-  20: {
+  30: {
     type: "wrapped",
     slides: [
       { id: "intro" },
@@ -1954,6 +2036,19 @@ const CONTENT = {
     text: "Attrape les cœurs ❤️, evite les cœurs brises 💔 — tu as 3 vies.",
     target: 12,
     winText: "Tu as attrapé autant de cœurs que de raisons de t'aimer, je t'aime fort."
+  },
+  20: {
+    type: "slotmachine",
+    text: "Une petite machine a sous. Tente ta chance.",
+    winRate: 0.8,
+    combos: [
+      { symbol: "❤️", type: "hearts_flood" },
+      { symbol: "💕", type: "text", text: "Je t'aimeeeeeee 💕💕💕" },
+      { symbol: "🌹", type: "text", text: "Trois roses, zero doute : tu me manques trop." },
+      { symbol: "💍", type: "text", text: "Le vrai jackpot je l'ai deja tire, c'est toi." },
+      { symbol: "⭐", type: "text", text: "Les etoiles, comme celle qu'on regardait ensemble y'a quelques jours." }
+    ],
+    fillerSymbols: ["🍀", "✨"]
   },
   6: {
     type: "datesquiz",
@@ -2071,7 +2166,8 @@ const TAG_LABELS = {
   together: "On etait ensemble ❤️",
   boardingpass: "Embarquement ✈️",
   lovewheel: "Petit jeu",
-  heartcatch: "Petit jeu"
+  heartcatch: "Petit jeu",
+  slotmachine: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -2138,6 +2234,7 @@ function escapeAttr(str){
 }
 
 function showDay(day){
+  if(dayCleanup){ dayCleanup(); dayCleanup = null; }
   document.querySelectorAll('.day-cell').forEach(c => {
     if(parseInt(c.dataset.day) === day) c.classList.add('viewed');
   });
@@ -2211,6 +2308,15 @@ function showDay(day){
       <div id="heartcatch-root"></div>
     `;
     initHeartCatch(data, day);
+  } else if(data.type === 'slotmachine'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.slotmachine}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="slotmachine-root"></div>
+    `;
+    initSlotMachine(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -2841,6 +2947,123 @@ function initHeartCatch(data, dayNum){
   startGame();
 }
 
+/* ---------- MACHINE A SOUS ---------- */
+function initSlotMachine(data, dayNum){
+  const root = document.getElementById('slotmachine-root');
+  const combos = data.combos;
+  const fillers = data.fillerSymbols || [];
+  const winRate = data.winRate != null ? data.winRate : 0.8;
+  const allSymbols = combos.map(c => c.symbol).concat(fillers);
+
+  root.innerHTML = `
+    <div class="slot-wrap">
+      <div class="slot-machine">
+        <div class="slot-reels">
+          <div class="slot-reel" id="slot-r0">🍀</div>
+          <div class="slot-reel" id="slot-r1">🍀</div>
+          <div class="slot-reel" id="slot-r2">🍀</div>
+        </div>
+      </div>
+      <button class="slot-btn" id="slot-btn">Lancer 🎰</button>
+      <div class="slot-result" id="slot-result"></div>
+    </div>
+  `;
+
+  const reels = [
+    document.getElementById('slot-r0'),
+    document.getElementById('slot-r1'),
+    document.getElementById('slot-r2')
+  ];
+  const btn = document.getElementById('slot-btn');
+  const resultEl = document.getElementById('slot-result');
+
+  function randSymbol(){
+    return allSymbols[Math.floor(Math.random() * allSymbols.length)];
+  }
+
+  function spawnFlyingHearts(card){
+    const overlay = document.createElement('div');
+    overlay.className = 'slot-hearts-overlay';
+    card.appendChild(overlay);
+    const HEARTS = ['❤️','💕','💖','💗'];
+    let count = 0;
+    const interval = setInterval(() => {
+      for(let i=0;i<3;i++){
+        const h = document.createElement('span');
+        h.className = 'slot-flying-heart';
+        h.textContent = HEARTS[Math.floor(Math.random()*HEARTS.length)];
+        const left = Math.random()*90 + 5;
+        const hx = (Math.random()*60 - 30).toFixed(0);
+        const hr = (Math.random()*50 - 25).toFixed(0);
+        const dur = (2.2 + Math.random()*1.4).toFixed(2);
+        h.style.left = left + '%';
+        h.style.setProperty('--hx', hx + 'px');
+        h.style.setProperty('--hr', hr + 'deg');
+        h.style.animationDuration = dur + 's';
+        overlay.appendChild(h);
+        h.addEventListener('animationend', () => h.remove());
+      }
+      count++;
+    }, 260);
+    dayCleanup = () => { clearInterval(interval); overlay.remove(); };
+  }
+
+  function spin(){
+    btn.disabled = true;
+    resultEl.classList.remove('show');
+    resultEl.textContent = '';
+    resultEl.className = 'slot-result';
+    if(dayCleanup){ dayCleanup(); dayCleanup = null; }
+
+    const isWin = Math.random() < winRate;
+    let finalSymbols;
+    let wonCombo = null;
+
+    if(isWin){
+      wonCombo = combos[Math.floor(Math.random() * combos.length)];
+      finalSymbols = [wonCombo.symbol, wonCombo.symbol, wonCombo.symbol];
+    } else {
+      do {
+        finalSymbols = [randSymbol(), randSymbol(), randSymbol()];
+      } while(finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]);
+    }
+
+    const stopDelays = [900, 1400, 1950];
+    reels.forEach((reel, i) => {
+      reel.classList.add('spinning');
+      reel.classList.remove('landed');
+      const flicker = setInterval(() => { reel.textContent = randSymbol(); }, 70);
+      setTimeout(() => {
+        clearInterval(flicker);
+        reel.classList.remove('spinning');
+        reel.textContent = finalSymbols[i];
+        reel.classList.add('landed');
+      }, stopDelays[i]);
+    });
+
+    setTimeout(() => {
+      if(isWin){
+        if(wonCombo.type === 'hearts_flood'){
+          const card = document.getElementById('content-card');
+          spawnFlyingHearts(card);
+          resultEl.textContent = "Coup de coeur. Littéralement.";
+        } else {
+          resultEl.textContent = wonCombo.text;
+        }
+        resultEl.classList.add('show');
+      } else {
+        resultEl.classList.add('miss');
+        resultEl.textContent = "Raté... on retente ?";
+        resultEl.classList.add('show');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Rejouer 🎰';
+    }, stopDelays[2] + 150);
+  }
+
+  btn.addEventListener('click', spin);
+}
+
 /* ---------- RAPPORT OFFICIEL ---------- */
 function initRapport(data){
   const root = document.getElementById('rapport-root');
@@ -3066,7 +3289,7 @@ function velibNo(){
   btns.innerHTML = '<p class="velib-answered">Moi oui en tout cas 🚲</p>';
 }
 
-/* ---------- WRAPPED (jour 20) ---------- */
+/* ---------- WRAPPED (jour 30) ---------- */
 function initWrapped(data){
   const root = document.getElementById('wrapped-root');
   const TOTAL = data.slides.length;
@@ -3668,6 +3891,7 @@ function closeDay(){
   const panel = document.getElementById('content-panel');
   panel.classList.remove('visible');
   document.body.style.overflow = '';
+  if(dayCleanup){ dayCleanup(); dayCleanup = null; }
 }
 
 document.addEventListener('click', function(e){
@@ -3709,6 +3933,9 @@ const DayState = {
   load(day){ try{ const v=localStorage.getItem('day_'+day); return v?JSON.parse(v):null; }catch(e){ return null; } },
   clear(day){ try{ localStorage.removeItem('day_'+day); }catch(e){} }
 };
+
+/* Hook de nettoyage pour les animations continues (ex: pluie de coeurs) */
+let dayCleanup = null;
 
 function restartDay(dayNum, gameType){
   DayState.clear(dayNum);
