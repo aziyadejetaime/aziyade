@@ -2646,10 +2646,20 @@ const CONTENT = {
     type: "safari",
     text: "Prends tes jumelles et explore la savane.<br><br>Il y a quelque chose de cache dans les hautes herbes."
   },
-  28: {
+  // NOTE: le jour 27 et le jour 28 partagent volontairement le meme contenu (mini jeu runner).
+  // Ce n'est pas un bug / une erreur de copier-coller : c'est fait expres a la demande de l'utilisateur.
+  27: {
     type: "runner",
     text: "Un vrai petit jeu, pour changer.<br><br>Cours, saute au-dessus des obstacles, attrape les coeurs. Je t'attends au bout.",
-    sprite: "images/m2.jpg",
+    sprite: "images/28-sprite.jpg",
+    finishSprite: "images/28-finish.jpg",
+    winText: "Peu importe les obstacles, tu finis toujours par me rejoindre.<br><br>Comme dans la vraie vie. ❤️"
+  },
+  28: {
+    // Volontairement identique au jour 27 (voir note ci-dessus) — pas un doublon accidentel.
+    type: "runner",
+    text: "Un vrai petit jeu, pour changer.<br><br>Cours, saute au-dessus des obstacles, attrape les coeurs. Je t'attends au bout.",
+    sprite: "images/28-sprite.jpg",
     finishSprite: "images/28-finish.jpg",
     winText: "Peu importe les obstacles, tu finis toujours par me rejoindre.<br><br>Comme dans la vraie vie. ❤️"
   },
@@ -4649,12 +4659,14 @@ function initRunner(data, dayNum){
     grad.addColorStop(1, '#e39a63');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, groundY);
+    const nearFinish = Math.max(0, Math.min(1, (distance - DISTANCE_TARGET * 0.78) / (DISTANCE_TARGET * 0.22)));
+    const hillAmp = 40 * (1 - nearFinish);
     const hillOff = (distance * 0.3) % w;
     ctx.fillStyle = 'rgba(40,20,40,0.35)';
     for(let i = -1; i < 2; i++){
       const bx = i * w - hillOff;
       ctx.beginPath();
-      ctx.ellipse(bx + w * 0.3, groundY, w * 0.5, 40, 0, Math.PI, 0, true);
+      ctx.ellipse(bx + w * 0.3, groundY, w * 0.5, hillAmp, 0, Math.PI, 0, true);
       ctx.fill();
     }
   }
