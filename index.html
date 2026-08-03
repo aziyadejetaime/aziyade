@@ -1340,6 +1340,8 @@
     border-radius: 50%;
     background-color: #f6dbe4;
     background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,255,255,0.85);
     transform: translateY(-50%);
     transition: right 1.1s cubic-bezier(.2,.8,.3,1.1);
@@ -2648,8 +2650,7 @@ const CONTENT = {
     type: "runner",
     text: "Un vrai petit jeu, pour changer.<br><br>Cours, saute au-dessus des obstacles, attrape les coeurs. Je t'attends au bout.",
     sprite: "images/m2.jpg",
-    finishSprite: "images/3.jpg",
-    finishCrop: { size: "230% auto", position: "72% 20%" },
+    finishSprite: "images/28-finish.jpg",
     winText: "Peu importe les obstacles, tu finis toujours par me rejoindre.<br><br>Comme dans la vraie vie. ❤️"
   },
   29: {
@@ -4574,10 +4575,6 @@ function initRunner(data, dayNum){
   const introBubble = document.getElementById('rn-intro-bubble');
 
   introAvatar.style.backgroundImage = `url(${data.finishSprite || data.sprite})`;
-  if(data.finishCrop){
-    introAvatar.style.backgroundSize = data.finishCrop.size || '100% auto';
-    introAvatar.style.backgroundPosition = data.finishCrop.position || 'center';
-  }
 
   const sprite = new Image();
   sprite.src = data.sprite;
