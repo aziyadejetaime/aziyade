@@ -1200,6 +1200,76 @@
   .safari-hint.fading{ opacity: 0; }
   .safari-wrap.found{ cursor: default; }
 
+  /* ---------- MINI JEU RUNNER ---------- */
+  .runner-wrap{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: #1a1220;
+    box-shadow: 0 14px 34px rgba(20,10,20,0.3);
+    touch-action: manipulation;
+  }
+  .runner-wrap.shake{ animation: rnShake 0.22s ease; }
+  @keyframes rnShake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-4px); }
+    75%{ transform: translateX(4px); }
+  }
+  .runner-canvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    display:block;
+  }
+  .runner-progress{
+    position:absolute;
+    top: 12px; left: 12px; right: 12px;
+    height: 6px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 999px;
+    overflow: hidden;
+    z-index: 3;
+  }
+  .runner-progress-fill{
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f4789a, #ffd3de);
+    border-radius: 999px;
+    transition: width 0.1s linear;
+  }
+  .runner-hint{
+    position:absolute;
+    bottom: 16px; left:50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.16);
+    color:#fff;
+    font-size: 12.5px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    z-index: 3;
+    pointer-events:none;
+    transition: opacity 0.5s ease;
+  }
+  .runner-hint.fading{ opacity: 0; }
+  .runner-wintext{
+    position:absolute;
+    left: 8%; right: 8%; top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    font-family: var(--serif); font-size: 17px; line-height:1.6;
+    color: #fff; text-align:center;
+    background: rgba(20,12,20,0.55);
+    backdrop-filter: blur(3px);
+    border-radius: 16px;
+    padding: 20px 18px;
+    opacity: 0;
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.3,1.3,.4,1);
+    z-index: 4;
+    pointer-events:none;
+  }
+  .runner-wintext.show{ opacity: 1; transform: translateY(-50%) scale(1); }
+
   /* ---------- MACHINE A SOUS ---------- */
   .slot-wrap{ display:flex; flex-direction:column; align-items:center; }
   .slot-machine{
@@ -2476,6 +2546,12 @@ const CONTENT = {
     type: "safari",
     text: "Prends tes jumelles et explore la savane.<br><br>Il y a quelque chose de cache dans les hautes herbes."
   },
+  28: {
+    type: "runner",
+    text: "Un vrai petit jeu, pour changer.<br><br>Cours, saute au-dessus des obstacles, attrape les coeurs. Je t'attends au bout.",
+    sprite: "images/m2.jpg",
+    winText: "Peu importe les obstacles, tu finis toujours par me rejoindre.<br><br>Comme dans la vraie vie. ❤️"
+  },
   29: {
     type: "wrapped",
     slides: [
@@ -2675,7 +2751,8 @@ const TAG_LABELS = {
   letter: "Une lettre",
   camerastar: "Petit jeu",
   petals: "Un moment",
-  safari: "Petit jeu"
+  safari: "Petit jeu",
+  runner: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -2870,6 +2947,15 @@ function showDay(day){
       <div id="safari-root"></div>
     `;
     initSafari(data, day);
+  } else if(data.type === 'runner'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.runner}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="runner-root"></div>
+    `;
+    initRunner(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -4340,6 +4426,296 @@ function initSafari(data, dayNum){
   };
 }
 
+
+
+/* ---------- MINI JEU RUNNER ---------- */
+function initRunner(data, dayNum){
+  const root = document.getElementById('runner-root');
+
+  root.innerHTML = `
+    <div class="runner-wrap" id="rn-wrap">
+      <div class="runner-progress"><div class="runner-progress-fill" id="rn-fill"></div></div>
+      <canvas class="runner-canvas" id="rn-canvas"></canvas>
+      <div class="runner-hint" id="rn-hint">Touche l'ecran pour sauter</div>
+      <div class="runner-wintext" id="rn-wintext">${data.winText}</div>
+    </div>
+  `;
+
+  const wrap = document.getElementById('rn-wrap');
+  const canvas = document.getElementById('rn-canvas');
+  const ctx = canvas.getContext('2d');
+  const hint = document.getElementById('rn-hint');
+  const fill = document.getElementById('rn-fill');
+  const wintextEl = document.getElementById('rn-wintext');
+
+  const sprite = new Image();
+  sprite.src = data.sprite;
+
+  let w = 0, h = 0, groundY = 0;
+  function sizeAll(){
+    const rect = wrap.getBoundingClientRect();
+    w = rect.width; h = rect.height;
+    canvas.width = w; canvas.height = h;
+    groundY = h * 0.82;
+  }
+  sizeAll();
+  window.addEventListener('resize', sizeAll);
+
+  const DISTANCE_TARGET = 5200;
+  let distance = 0;
+  let speed = 2.6;
+  let finished = false;
+  let raf = null;
+  let spawnTimer = 0;
+  let heartTimer = 0;
+
+  const playerX = 0.22;
+  const player = { y: 0, vy: 0, radius: 26, jumping: false, hurtFlash: 0, squash: 1 };
+
+  const obstacles = [];
+  const hearts = [];
+  const collected = { count: 0 };
+
+  function reset(){
+    player.y = 0; player.vy = 0; player.jumping = false;
+  }
+  reset();
+
+  function jump(){
+    if(finished) return;
+    if(!player.jumping){
+      player.vy = -12.5;
+      player.jumping = true;
+      hint.classList.add('fading');
+    }
+  }
+
+  function spawnObstacle(){
+    const size = 22 + Math.random() * 14;
+    obstacles.push({ x: w + size, w: size, h: size, passed: false });
+  }
+  function spawnHeartCollectible(){
+    hearts.push({ x: w + 20, y: groundY - 60 - Math.random() * 70, r: 12, taken: false });
+  }
+
+  function drawGround(){
+    ctx.fillStyle = '#3c2716';
+    ctx.fillRect(0, groundY, w, h - groundY);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    ctx.lineTo(w, groundY);
+    ctx.stroke();
+    const off = (distance * 1.4) % 40;
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    for(let x = -off; x < w; x += 40){
+      ctx.fillRect(x, groundY + 8, 20, 4);
+    }
+  }
+
+  function drawSky(){
+    const grad = ctx.createLinearGradient(0, 0, 0, groundY);
+    grad.addColorStop(0, '#2b1a3f');
+    grad.addColorStop(0.5, '#8a4a63');
+    grad.addColorStop(1, '#e39a63');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, groundY);
+    const hillOff = (distance * 0.3) % w;
+    ctx.fillStyle = 'rgba(40,20,40,0.35)';
+    for(let i = -1; i < 2; i++){
+      const bx = i * w - hillOff;
+      ctx.beginPath();
+      ctx.ellipse(bx + w * 0.3, groundY, w * 0.5, 40, 0, Math.PI, 0, true);
+      ctx.fill();
+    }
+  }
+
+  function drawObstacle(o){
+    ctx.save();
+    ctx.translate(o.x, groundY - o.h / 2);
+    ctx.fillStyle = '#1f1420';
+    ctx.beginPath();
+    ctx.ellipse(0, o.h * 0.15, o.w * 0.5, o.h * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, -o.h * 0.25, o.w * 0.32, o.h * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawHeart(hObj){
+    ctx.save();
+    ctx.translate(hObj.x, hObj.y);
+    ctx.font = (hObj.r * 2) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f4789a';
+    ctx.fillText('❤', 0, 0);
+    ctx.restore();
+  }
+
+  function drawPlayer(){
+    const px = w * playerX;
+    const py = groundY - player.radius - player.y;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(1 / player.squash, player.squash);
+
+    ctx.beginPath();
+    ctx.ellipse(0, player.radius + 6, player.radius * 0.9, player.radius * 0.25, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fill();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    if(sprite.complete && sprite.naturalWidth){
+      const iw = sprite.naturalWidth, ih = sprite.naturalHeight;
+      const targetSize = player.radius * 2.15;
+      const scale = targetSize / Math.min(iw, ih);
+      const dw = iw * scale, dh = ih * scale;
+      ctx.drawImage(sprite, -dw / 2, -dh * 0.34, dw, dh);
+    } else {
+      ctx.fillStyle = '#f6dbe4';
+      ctx.fillRect(-player.radius, -player.radius, player.radius * 2, player.radius * 2);
+    }
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = player.hurtFlash > 0 ? '#ff5c7a' : '#fff';
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawFinish(){
+    if(distance < DISTANCE_TARGET - w) return;
+    const fx = w * playerX + (DISTANCE_TARGET - distance) + w * 0.32;
+    ctx.save();
+    ctx.translate(fx, groundY - 34);
+    const pulse = 1 + 0.08 * Math.sin(performance.now() / 260);
+    ctx.font = (40 * pulse) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f4789a';
+    ctx.shadowColor = 'rgba(244,120,154,0.8)';
+    ctx.shadowBlur = 18;
+    ctx.fillText('❤', 0, 0);
+    ctx.restore();
+  }
+
+  function update(dt){
+    if(finished) return;
+
+    distance += speed * dt;
+    if(speed < 4.2) speed += 0.0006 * dt;
+
+    player.vy += 0.62 * dt;
+    player.y -= player.vy * dt;
+    if(player.y <= 0){
+      player.y = 0;
+      player.vy = 0;
+      if(player.jumping){ player.jumping = false; player.squash = 1.2; }
+    }
+    player.squash += (1 - player.squash) * 0.2;
+
+    if(player.hurtFlash > 0) player.hurtFlash -= dt;
+
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnObstacle();
+      spawnTimer = 55 + Math.random() * 45;
+    }
+    heartTimer -= dt;
+    if(heartTimer <= 0){
+      spawnHeartCollectible();
+      heartTimer = 60 + Math.random() * 50;
+    }
+
+    const px = w * playerX;
+    for(let i = obstacles.length - 1; i >= 0; i--){
+      const o = obstacles[i];
+      o.x -= speed * dt;
+      const py = groundY - player.radius - player.y;
+      const dx = px - o.x, dy = py - (groundY - o.h / 2);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if(!o.passed && dist < player.radius * 0.85 + o.w * 0.4){
+        o.passed = true;
+        player.hurtFlash = 18;
+        wrap.classList.add('shake');
+        setTimeout(() => wrap.classList.remove('shake'), 220);
+      }
+      if(o.x < -60) obstacles.splice(i, 1);
+    }
+
+    for(let i = hearts.length - 1; i >= 0; i--){
+      const hObj = hearts[i];
+      hObj.x -= speed * dt;
+      const py = groundY - player.radius - player.y;
+      const dx = px - hObj.x, dy = py - hObj.y;
+      if(!hObj.taken && Math.sqrt(dx * dx + dy * dy) < player.radius + hObj.r){
+        hObj.taken = true;
+        collected.count++;
+      }
+      if(hObj.taken || hObj.x < -40) hearts.splice(i, 1);
+    }
+
+    const pct = Math.min(1, distance / DISTANCE_TARGET);
+    fill.style.width = (pct * 100) + '%';
+
+    if(distance >= DISTANCE_TARGET){
+      finish();
+    }
+  }
+
+  function render(){
+    ctx.clearRect(0, 0, w, h);
+    drawSky();
+    drawGround();
+    drawFinish();
+    obstacles.forEach(drawObstacle);
+    hearts.filter(hh => !hh.taken).forEach(drawHeart);
+    drawPlayer();
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(2.4, (now - last) / 16.6);
+    last = now;
+    update(dt);
+    render();
+    if(!finished) raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+
+  function finish(){
+    finished = true;
+    cancelAnimationFrame(raf);
+    hint.remove();
+    wrap.classList.add('finished');
+    setTimeout(() => { wintextEl.classList.add('show'); }, 500);
+  }
+
+  function onInput(e){
+    if(e.type === 'keydown' && e.code !== 'Space') return;
+    e.preventDefault && e.preventDefault();
+    jump();
+  }
+  wrap.addEventListener('pointerdown', onInput);
+  window.addEventListener('keydown', onInput);
+
+  dayCleanup = () => {
+    cancelAnimationFrame(raf);
+    window.removeEventListener('resize', sizeAll);
+    wrap.removeEventListener('pointerdown', onInput);
+    window.removeEventListener('keydown', onInput);
+  };
+}
 
 /* ---------- MACHINE A SOUS ---------- */
 function initSlotMachine(data, dayNum){
