@@ -1370,6 +1370,240 @@
     transform: rotate(45deg);
   }
 
+  /* ---------- COFFRE FORT ---------- */
+  .safe-wrap{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: #0c0908;
+    box-shadow: 0 14px 34px rgba(20,10,10,0.35);
+    perspective: 1400px;
+  }
+  .safe-wrap.unlocking .safe-dial-plate{ animation: safeShudder 0.7s ease; }
+  @keyframes safeShudder{
+    0%,100%{ transform: translate(0,0); }
+    20%{ transform: translate(-1px,0); }
+    40%{ transform: translate(1px,0); }
+    60%{ transform: translate(-1px,0); }
+    80%{ transform: translate(1px,0); }
+  }
+  .safe-wrap.clicked .safe-door{ animation: safeThunk 0.18s ease; }
+  @keyframes safeThunk{
+    0%{ transform: translateX(0) scale(1); }
+    50%{ transform: translateX(-3px) scale(0.997); }
+    100%{ transform: translateX(0) scale(1); }
+  }
+
+  .safe-interior{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 50% 38%, #4a2e1c, #1a0f08 78%);
+    box-shadow: inset 0 0 60px 10px rgba(0,0,0,0.7);
+  }
+  .safe-interior::before{
+    content:"";
+    position:absolute; inset: 6%;
+    border: 2px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    pointer-events:none;
+  }
+  .safe-rays{
+    position:absolute; inset:0;
+    background: conic-gradient(from 0deg at 50% 38%,
+      rgba(255,214,160,0.16) 0deg, transparent 12deg,
+      rgba(255,214,160,0.10) 24deg, transparent 40deg,
+      rgba(255,214,160,0.14) 55deg, transparent 70deg,
+      rgba(255,214,160,0.10) 90deg, transparent 110deg,
+      rgba(255,214,160,0.16) 130deg, transparent 150deg,
+      rgba(255,214,160,0.1) 170deg, transparent 190deg,
+      rgba(255,214,160,0.14) 220deg, transparent 250deg,
+      rgba(255,214,160,0.1) 280deg, transparent 320deg,
+      rgba(255,214,160,0.14) 340deg, transparent 360deg);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    mix-blend-mode: screen;
+  }
+  .safe-rays.show{ opacity: 1; animation: safeRaysTurn 12s linear infinite; }
+  @keyframes safeRaysTurn{
+    from{ transform: rotate(0deg); }
+    to{ transform: rotate(360deg); }
+  }
+  .safe-glow{
+    position:absolute; left:50%; top:42%;
+    width: 65%; aspect-ratio:1;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(255,214,160,0.4), transparent 70%);
+  }
+  .safe-wintext{
+    position:relative;
+    max-width: 78%;
+    font-family: var(--serif); font-size: 18px; line-height:1.6;
+    color: #fff6e8; text-align:center;
+    text-shadow: 0 0 16px rgba(255,214,160,0.6);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(.3,1.3,.4,1);
+  }
+  .safe-wintext.show{ opacity: 1; transform: scale(1); }
+
+  .safe-door{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 30% 22%, rgba(255,255,255,0.16), transparent 40%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 3px, transparent 3px 8px),
+      linear-gradient(160deg, #78716a, #4b453f 50%, #2c2723);
+    box-shadow:
+      inset 0 0 0 7px #201d1b,
+      inset 0 0 0 9px #66605a,
+      inset 0 0 30px 6px rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(.5,0,.15,1), opacity 0.5s ease 0.5s;
+    z-index: 2;
+  }
+  .safe-door::before{
+    content:"";
+    position:absolute; inset:14px;
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.15) inset,
+      6px 6px 0 -4px rgba(138,132,124,0.55),
+      calc(100% - 6px) 6px 0 -4px rgba(138,132,124,0.55),
+      6px calc(100% - 6px) 0 -4px rgba(138,132,124,0.55),
+      calc(100% - 6px) calc(100% - 6px) 0 -4px rgba(138,132,124,0.55);
+    pointer-events:none;
+  }
+  .safe-hinge{
+    position:absolute; left: 2px;
+    width: 14px; height: 46px;
+    background: linear-gradient(180deg, #8a847c, #3c3733);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.4);
+    z-index: 3;
+  }
+  .safe-hinge-top{ top: 12%; }
+  .safe-hinge-bottom{ bottom: 12%; }
+  .safe-door.open{
+    transform: rotateY(-112deg);
+    opacity: 0;
+    pointer-events:none;
+  }
+
+  .safe-dial-plate{
+    position:relative;
+    width: 76%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 26%, #aca69e, #6b6660 55%, #46423e 85%);
+    box-shadow:
+      inset 0 0 0 3px rgba(0,0,0,0.3),
+      inset 0 8px 16px rgba(255,255,255,0.15),
+      inset 0 -10px 18px rgba(0,0,0,0.35),
+      0 6px 16px rgba(0,0,0,0.5);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap: 14px;
+  }
+  .safe-dial-plate::before{
+    content:"";
+    position:absolute; inset: -6px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #201d1b, 0 0 0 5px #7a746c;
+    pointer-events:none;
+  }
+  .safe-wheels{
+    position:relative;
+    display:flex;
+    gap: 5px;
+    background: #100e0d;
+    padding: 7px 9px;
+    border-radius: 8px;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.75), inset 0 0 0 1px rgba(255,255,255,0.06);
+    z-index: 2;
+  }
+  .safe-wheel-window{
+    position:relative;
+    width: 32px;
+    height: 40px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #050403, #14110f);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    cursor: ns-resize;
+    touch-action: none;
+  }
+  .safe-wheel-window::before{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75), transparent 32%, transparent 68%, rgba(0,0,0,0.75));
+    pointer-events:none;
+    z-index: 2;
+  }
+  .safe-wheel-window::after{
+    content:"";
+    position:absolute; left:2px; right:2px; top:50%;
+    height: 1px;
+    background: rgba(255,180,120,0.55);
+    box-shadow: 0 0 4px rgba(255,180,120,0.4);
+    transform: translateY(-50%);
+    pointer-events:none;
+    z-index: 2;
+  }
+  .safe-wheel{
+    position:absolute; top:50%; left:0; right:0;
+  }
+  .safe-cell{
+    position:absolute; top:-20px; left:0; right:0;
+    height: 40px;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--sans); font-weight:700; font-size: 17px;
+    color: #ffd6a0;
+    text-shadow: 0 0 6px rgba(255,180,100,0.3);
+    user-select:none;
+  }
+  .safe-dial-hint{
+    position:relative; z-index:2;
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.55);
+    text-align:center;
+    letter-spacing: 0.2px;
+  }
+  .safe-wheel-handle{
+    position:relative;
+    width: 46px; height: 46px;
+    z-index: 2;
+  }
+  .safe-wheel-handle-spokes{
+    position:absolute; inset:0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, transparent 0 28%, #26221f 28% 34%, transparent 34%),
+      linear-gradient(0deg, transparent 46%, #35302c 46% 54%, transparent 54%),
+      linear-gradient(60deg, transparent 46%, #35302c 46% 54%, transparent 54%),
+      linear-gradient(120deg, transparent 46%, #35302c 46% 54%, transparent 54%);
+    box-shadow: inset 0 0 0 2px #17140f, 0 2px 5px rgba(0,0,0,0.4);
+  }
+  .safe-wheel-handle-hub{
+    position:absolute; left:50%; top:50%;
+    width: 13px; height: 13px;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle at 35% 30%, #cfc8bd, #6b6560);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px #17140f;
+  }
+  .safe-wheel-handle.spin{
+    animation: safeHandleSpin 0.7s cubic-bezier(.3,0,.2,1);
+  }
+  @keyframes safeHandleSpin{
+    from{ transform: rotate(0deg); }
+    to{ transform: rotate(540deg); }
+  }
+
   /* ---------- MACHINE A SOUS ---------- */
   .slot-wrap{ display:flex; flex-direction:column; align-items:center; }
   .slot-machine{
@@ -2663,6 +2897,12 @@ const CONTENT = {
     finishSprite: "images/28-finish.jpg",
     winText: "Peu importe les obstacles, tu finis toujours par me rejoindre.<br><br>Comme dans la vraie vie. ❤️"
   },
+  30: {
+    type: "safe",
+    text: "Il y a un coffre devant toi.<br><br>Le code, c'est une date qu'on n'oublie pas.",
+    code: "1202",
+    winText: "Je t'aime fort, tu me manques. ❤️"
+  },
   29: {
     type: "wrapped",
     slides: [
@@ -2863,7 +3103,8 @@ const TAG_LABELS = {
   camerastar: "Petit jeu",
   petals: "Un moment",
   safari: "Petit jeu",
-  runner: "Petit jeu"
+  runner: "Petit jeu",
+  safe: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -3067,6 +3308,15 @@ function showDay(day){
       <div id="runner-root"></div>
     `;
     initRunner(data, day);
+  } else if(data.type === 'safe'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.safe}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="safe-root"></div>
+    `;
+    initSafe(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -4945,6 +5195,146 @@ function initRunner(data, dayNum){
   };
 }
 
+
+
+/* ---------- COFFRE FORT ---------- */
+function initSafe(data, dayNum){
+  const root = document.getElementById('safe-root');
+  const codeDigits = data.code.split('').map(Number);
+  const ITEM_H = 40;
+  const RANGE = 24;
+
+  function buildWheelCells(){
+    let html = '';
+    for(let i = -RANGE; i <= RANGE; i++){
+      const d = ((i % 10) + 10) % 10;
+      html += `<div class="safe-cell" style="transform:translateY(${i * ITEM_H}px)">${d}</div>`;
+    }
+    return html;
+  }
+
+  root.innerHTML = `
+    <div class="safe-wrap" id="sf2-wrap">
+      <div class="safe-interior" id="sf2-interior">
+        <div class="safe-rays" id="sf2-rays"></div>
+        <div class="safe-glow"></div>
+        <div class="safe-wintext" id="sf2-wintext">${data.winText}</div>
+      </div>
+      <div class="safe-door" id="sf2-door">
+        <div class="safe-hinge safe-hinge-top"></div>
+        <div class="safe-hinge safe-hinge-bottom"></div>
+        <div class="safe-dial-plate">
+          <div class="safe-wheels" id="sf2-wheels">
+            ${[0, 1, 2, 3].map(i => `
+              <div class="safe-wheel-window">
+                <div class="safe-wheel" id="sf2-wheel-${i}" data-pos="0">${buildWheelCells()}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="safe-dial-hint">Fais glisser chaque molette</div>
+          <div class="safe-wheel-handle" id="sf2-handle">
+            <div class="safe-wheel-handle-spokes"></div>
+            <div class="safe-wheel-handle-hub"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const wrap = document.getElementById('sf2-wrap');
+  const door = document.getElementById('sf2-door');
+  const wintextEl = document.getElementById('sf2-wintext');
+  let unlocked = false;
+
+  const wheels = [0, 1, 2, 3].map(i => {
+    const el = document.getElementById(`sf2-wheel-${i}`);
+    return { el, pos: 0, dragging: false, startY: 0, startPos: 0 };
+  });
+
+  function applyWheel(wh){
+    wh.el.style.transform = `translateY(${-wh.pos * ITEM_H}px)`;
+  }
+
+  function currentDigit(wh){
+    return ((Math.round(wh.pos) % 10) + 10) % 10;
+  }
+
+  function checkCombo(){
+    if(unlocked) return;
+    const allSettled = wheels.every(wh => !wh.dragging && Math.abs(wh.pos - Math.round(wh.pos)) < 0.01);
+    if(!allSettled) return;
+    const ok = wheels.every((wh, i) => currentDigit(wh) === codeDigits[i]);
+    if(ok) unlock();
+  }
+
+  function onDown(wh){
+    return (e) => {
+      wh.dragging = true;
+      wh.startY = e.touches ? e.touches[0].clientY : e.clientY;
+      wh.startPos = wh.pos;
+      wh.el.style.transition = 'none';
+    };
+  }
+  function onMove(wh){
+    return (e) => {
+      if(!wh.dragging) return;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const dy = clientY - wh.startY;
+      wh.pos = wh.startPos + dy / ITEM_H;
+      applyWheel(wh);
+    };
+  }
+  function onUp(wh){
+    return () => {
+      if(!wh.dragging) return;
+      wh.dragging = false;
+      wh.pos = Math.round(wh.pos);
+      wh.el.style.transition = 'transform 0.2s ease';
+      applyWheel(wh);
+      setTimeout(checkCombo, 220);
+    };
+  }
+
+  const listeners = [];
+  wheels.forEach(wh => {
+    const win = wh.el.closest('.safe-wheel-window');
+    const down = onDown(wh), move = onMove(wh), up = onUp(wh);
+    win.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    win.addEventListener('touchstart', down, { passive: true });
+    window.addEventListener('touchmove', move, { passive: true });
+    window.addEventListener('touchend', up);
+    listeners.push({ win, down, move, up });
+  });
+
+  function unlock(){
+    unlocked = true;
+    const handle = document.getElementById('sf2-handle');
+    const rays = document.getElementById('sf2-rays');
+    wrap.classList.add('unlocking');
+    if(handle) handle.classList.add('spin');
+    setTimeout(() => {
+      wrap.classList.add('clicked');
+      setTimeout(() => {
+        door.classList.add('open');
+        if(rays) rays.classList.add('show');
+        setTimeout(() => { wintextEl.classList.add('show'); }, 650);
+      }, 180);
+    }, 700);
+  }
+
+  dayCleanup = () => {
+    listeners.forEach(({ win, down, move, up }) => {
+      win.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      win.removeEventListener('touchstart', down);
+      window.removeEventListener('touchmove', move);
+      window.removeEventListener('touchend', up);
+    });
+  };
+}
 
 /* ---------- MACHINE A SOUS ---------- */
 function initSlotMachine(data, dayNum){
