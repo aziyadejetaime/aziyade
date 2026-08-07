@@ -1604,6 +1604,226 @@
     to{ transform: rotate(540deg); }
   }
 
+  /* ---------- FLEUR QUI POUSSE ---------- */
+  .gf-wrap{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: var(--bg);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+  }
+  .gf-scene{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+  }
+  .gf-leaf{
+    opacity: 0;
+    transform: scale(0.2);
+    transform-origin: 150px 300px;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.3,1.4,.4,1);
+  }
+  #gf-flower{
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .gf-petal{
+    opacity: 0;
+    transform: scale(0.2);
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.3,1.5,.4,1);
+  }
+  .gf-center{ transition: opacity 0.3s ease; }
+  .gf-petal.shown{
+    opacity: 1;
+    transform: scale(1);
+  }
+  .gf-petals.open{
+    animation: gfPetalPop 0.5s cubic-bezier(.3,1.6,.4,1);
+  }
+  @keyframes gfPetalPop{
+    0%{ transform: scale(1); }
+    50%{ transform: scale(1.12); }
+    100%{ transform: scale(1); }
+  }
+  .gf-wrap.bloomed #gf-petals{ filter: drop-shadow(0 2px 6px rgba(230,120,160,0.35)); }
+
+  .gf-sun-btn{
+    position:absolute;
+    top: 18px; left:50%;
+    transform: translateX(-50%);
+    width: 56px; height:56px;
+    z-index: 4;
+    cursor: pointer;
+  }
+  .gf-sun-svg{ width:100%; height:100%; overflow: visible; }
+  .gf-sun-rays-svg{
+    transform-origin: 50px 50px;
+    animation: gfRaysSpin 14s linear infinite;
+  }
+  @keyframes gfRaysSpin{ to{ transform: rotate(360deg); } }
+  .gf-sun-btn.bounce .gf-sun-svg{ animation: gfSunBounce 0.35s ease; }
+  @keyframes gfSunBounce{
+    0%{ transform: scale(1); }
+    40%{ transform: scale(0.86); }
+    100%{ transform: scale(1); }
+  }
+  .gf-sun-btn.resting .gf-sun-rays-svg{ animation-duration: 30s; }
+
+  .gf-progress{
+    position:absolute;
+    top: 84px; left: 20%; right: 20%;
+    height: 5px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    z-index: 3;
+  }
+  .gf-progress-fill{
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #7fb069, #f4a7c6);
+    border-radius: 999px;
+    transition: width 0.25s ease;
+  }
+
+  .gf-hint{
+    position:absolute;
+    bottom: 16px; left:50%;
+    transform: translateX(-50%);
+    background: rgba(74,59,66,0.5);
+    color:#fff;
+    font-size: 12.5px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    z-index: 3;
+    pointer-events:none;
+    transition: opacity 0.5s ease;
+  }
+  .gf-hint.fading{ opacity: 0; }
+
+  .gf-sparkle{
+    position:absolute;
+    width: 5px; height:5px;
+    border-radius: 50%;
+    background: #fff3d6;
+    box-shadow: 0 0 6px 1px rgba(246,196,83,0.7);
+    transform: translate(-50%,-50%);
+    animation: gfSparkleFly 0.65s ease-out forwards;
+    pointer-events:none;
+    z-index: 4;
+  }
+  @keyframes gfSparkleFly{
+    0%{ transform: translate(-50%,-50%) translate(0,0); opacity: 1; }
+    100%{ transform: translate(-50%,-50%) translate(var(--dx), var(--dy)); opacity: 0; }
+  }
+
+  .gf-wintext-overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    padding: 10%;
+    background: rgba(255,246,234,0);
+    transition: background 0.7s ease;
+    pointer-events:none;
+    z-index: 5;
+  }
+  .gf-wrap.bloomed .gf-wintext-overlay{ background: rgba(255,246,234,0.55); }
+  .gf-wintext{
+    font-family: var(--serif); font-size: 17px; line-height:1.6;
+    color: var(--ink); text-align:center;
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.3,1.3,.4,1);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.14);
+  }
+  .gf-wintext.show{ opacity: 1; transform: scale(1); }
+
+  /* ---------- CHAT ET PELOTE ---------- */
+  .yc-wrap{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: var(--bg);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+    touch-action: none;
+  }
+  .yc-scene{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+  }
+  #yc-thread{ opacity: 0; }
+  #yc-cat{ transform-origin: 34px 335px; transform-box: fill-box; }
+  #yc-cat.yc-react{ animation: ycCatReact 0.4s ease; }
+  @keyframes ycCatReact{
+    0%,100%{ transform: rotate(0deg) scale(1); }
+    30%{ transform: rotate(-8deg) scale(1.08); }
+    60%{ transform: rotate(6deg) scale(1.05); }
+  }
+  #yc-cat.yc-happy{ animation: ycCatHappy 0.9s ease; }
+  @keyframes ycCatHappy{
+    0%,100%{ transform: translateY(0) scale(1); }
+    30%{ transform: translateY(-10px) scale(1.12); }
+    55%{ transform: translateY(0) scale(1); }
+    75%{ transform: translateY(-5px) scale(1.06); }
+  }
+  .yc-ball{
+    position:absolute;
+    width: 44px; height:44px;
+    margin-left: -22px; margin-top: -22px;
+    font-size: 34px;
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    z-index: 3;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    transition: left 0.25s cubic-bezier(.3,.6,.25,1), top 0.25s cubic-bezier(.3,.6,.25,1), opacity 0.3s ease, transform 0.25s ease;
+  }
+  .yc-ball.yc-caught{ transform: scale(1.35); }
+  .yc-ball.yc-gone{ opacity: 0; transform: scale(0.3); }
+  .yc-hint{
+    position:absolute;
+    bottom: 16px; left:50%;
+    transform: translateX(-50%);
+    background: rgba(74,59,66,0.5);
+    color:#fff;
+    font-size: 12.5px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    z-index: 3;
+    pointer-events:none;
+    transition: opacity 0.5s ease;
+  }
+  .yc-hint.fading{ opacity: 0; }
+  .yc-wintext-overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    padding: 10%;
+    background: rgba(255,246,234,0);
+    transition: background 0.7s ease;
+    pointer-events:none;
+    z-index: 5;
+  }
+  .yc-wrap.done .yc-wintext-overlay{ background: rgba(255,246,234,0.55); }
+  .yc-wintext{
+    font-family: var(--serif); font-size: 17px; line-height:1.6;
+    color: var(--ink); text-align:center;
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.3,1.3,.4,1);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.14);
+  }
+  .yc-wintext.show{ opacity: 1; transform: scale(1); }
+
   /* ---------- MACHINE A SOUS ---------- */
   .slot-wrap{ display:flex; flex-direction:column; align-items:center; }
   .slot-machine{
@@ -3075,6 +3295,16 @@ const CONTENT = {
     letterText: "Ma Aziyade,<br><br>Profite bien du Sri Lanka avec tout le monde.<br><br>Je t'aime tres fort et tu me manques ❤️❤️<br><br>— M"
   },
   // ... continuer jusqu'a 47
+  31: {
+    type: "growflower",
+    text: "Elle a besoin de toi pour pousser.<br><br>Touche le soleil, encore et encore.",
+    winText: "Voila une fleur pour toi, meme si on peut pas se voir ❤️"
+  },
+  32: {
+    type: "yarncat",
+    text: "Le chat s'ennuie. Touche la pelote, encore et encore.",
+    winText: "Meme en jouant, tout finit toujours par former un coeur. ❤️"
+  },
   47: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
 
@@ -3104,7 +3334,9 @@ const TAG_LABELS = {
   petals: "Un moment",
   safari: "Petit jeu",
   runner: "Petit jeu",
-  safe: "Petit jeu"
+  safe: "Petit jeu",
+  growflower: "Petit jeu",
+  yarncat: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -3317,6 +3549,24 @@ function showDay(day){
       <div id="safe-root"></div>
     `;
     initSafe(data, day);
+  } else if(data.type === 'growflower'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.growflower}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="growflower-root"></div>
+    `;
+    initGrowFlower(data, day);
+  } else if(data.type === 'yarncat'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.yarncat}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="yarncat-root"></div>
+    `;
+    initYarnCat(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -5335,6 +5585,342 @@ function initSafe(data, dayNum){
     });
   };
 }
+
+
+/* ---------- FLEUR QUI POUSSE ---------- */
+function initGrowFlower(data, dayNum){
+  const root = document.getElementById('growflower-root');
+  const TAP_TARGET = 22;
+
+  root.innerHTML = `
+    <div class="gf-wrap" id="gf-wrap">
+      <div class="gf-sun-btn" id="gf-sun">
+        <svg viewBox="0 0 100 100" class="gf-sun-svg">
+          <defs>
+            <radialGradient id="gf-sun-grad" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#fffbe6"/>
+              <stop offset="55%" stop-color="#ffd873"/>
+              <stop offset="100%" stop-color="#f5ad3d"/>
+            </radialGradient>
+          </defs>
+          <g class="gf-sun-rays-svg" stroke="#ffcf5c" stroke-width="5" stroke-linecap="round">
+            <line x1="50" y1="16" x2="50" y2="6"/>
+            <line x1="74" y1="26" x2="81" y2="19"/>
+            <line x1="84" y1="50" x2="94" y2="50"/>
+            <line x1="74" y1="74" x2="81" y2="81"/>
+            <line x1="50" y1="84" x2="50" y2="94"/>
+            <line x1="26" y1="74" x2="19" y2="81"/>
+            <line x1="16" y1="50" x2="6" y2="50"/>
+            <line x1="26" y1="26" x2="19" y2="19"/>
+          </g>
+          <circle cx="50" cy="50" r="26" fill="url(#gf-sun-grad)" stroke="#f6c453" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="gf-progress"><div class="gf-progress-fill" id="gf-fill"></div></div>
+
+      <svg class="gf-scene" viewBox="0 0 300 400" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="gf-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff6ea"/>
+            <stop offset="45%" stop-color="#fbe4ea"/>
+            <stop offset="100%" stop-color="#f3c9d6"/>
+          </linearGradient>
+          <linearGradient id="gf-pot" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#a85a34"/>
+            <stop offset="45%" stop-color="#dd8a55"/>
+            <stop offset="100%" stop-color="#9c4f2c"/>
+          </linearGradient>
+          <linearGradient id="gf-pot-rim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e8a56f"/>
+            <stop offset="100%" stop-color="#b5673a"/>
+          </linearGradient>
+          <radialGradient id="gf-petal-grad" cx="50%" cy="15%" r="90%">
+            <stop offset="0%" stop-color="#ffd9e8"/>
+            <stop offset="60%" stop-color="#f9a9c8"/>
+            <stop offset="100%" stop-color="#e879a8"/>
+          </radialGradient>
+          <radialGradient id="gf-center-grad" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ffe38a"/>
+            <stop offset="100%" stop-color="#f0a83c"/>
+          </radialGradient>
+        </defs>
+
+        <rect width="300" height="400" fill="url(#gf-sky)"/>
+        <circle cx="40" cy="70" r="34" fill="#ffffff" opacity="0.18"/>
+        <circle cx="255" cy="130" r="22" fill="#ffffff" opacity="0.15"/>
+        <circle cx="270" cy="60" r="14" fill="#ffffff" opacity="0.15"/>
+
+        <ellipse cx="150" cy="352" rx="62" ry="11" fill="#3c2312" opacity="0.15"/>
+
+        <path d="M96,300 L104,352 Q150,362 196,352 L204,300 Z" fill="url(#gf-pot)"/>
+        <path d="M150,300 L150,352" stroke="#7a3d20" stroke-width="1" opacity="0.25"/>
+        <rect x="90" y="288" width="120" height="18" rx="9" fill="url(#gf-pot-rim)"/>
+        <rect x="90" y="288" width="120" height="6" rx="3" fill="#f0be93" opacity="0.6"/>
+        <ellipse cx="150" cy="296" rx="50" ry="7" fill="#4a2c18"/>
+
+        <g id="gf-leaf-left" class="gf-leaf">
+          <path d="M150,272 C120,268 100,282 94,306 C126,306 146,290 150,272 Z" fill="#7fb069"/>
+          <path d="M150,272 C132,276 116,286 104,300" fill="none" stroke="#5c8a48" stroke-width="1.3" opacity="0.6"/>
+        </g>
+        <g id="gf-leaf-right" class="gf-leaf">
+          <path d="M150,242 C182,236 202,252 208,276 C178,276 156,260 150,242 Z" fill="#8fc17a"/>
+          <path d="M150,242 C168,246 186,258 198,272" fill="none" stroke="#6a9d55" stroke-width="1.3" opacity="0.6"/>
+        </g>
+
+        <path id="gf-stem" d="M150,298 C148,258 152,215 150,175 C149,158 150,145 150,132"
+          fill="none" stroke="#6a9a52" stroke-width="6" stroke-linecap="round"/>
+
+        <g id="gf-flower">
+          <ellipse cx="0" cy="6" rx="34" ry="10" fill="#3c2312" opacity="0.08"/>
+          <g id="gf-petals" class="gf-petals">
+            <g transform="rotate(0)"><ellipse class="gf-petal" id="gf-petal-0" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(45)"><ellipse class="gf-petal" id="gf-petal-1" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(90)"><ellipse class="gf-petal" id="gf-petal-2" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(135)"><ellipse class="gf-petal" id="gf-petal-3" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(180)"><ellipse class="gf-petal" id="gf-petal-4" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(225)"><ellipse class="gf-petal" id="gf-petal-5" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(270)"><ellipse class="gf-petal" id="gf-petal-6" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+            <g transform="rotate(315)"><ellipse class="gf-petal" id="gf-petal-7" cx="0" cy="-28" rx="13" ry="23" fill="url(#gf-petal-grad)"/></g>
+          </g>
+          <circle id="gf-center" class="gf-center" r="12" fill="url(#gf-center-grad)"/>
+          <g fill="#c9781f" opacity="0.5">
+            <circle cx="-3" cy="-2" r="0.9"/><circle cx="3" cy="-3" r="0.9"/><circle cx="0" cy="3" r="0.9"/>
+            <circle cx="-4" cy="3" r="0.9"/><circle cx="4" cy="2" r="0.9"/><circle cx="0" cy="-5" r="0.9"/>
+          </g>
+        </g>
+      </svg>
+
+      <div class="gf-hint" id="gf-hint">Touche le soleil</div>
+      <div class="gf-wintext-overlay" id="gf-wintext-overlay">
+        <div class="gf-wintext" id="gf-wintext">${data.winText}</div>
+      </div>
+    </div>
+  `;
+
+  const wrap = document.getElementById('gf-wrap');
+  const sun = document.getElementById('gf-sun');
+  const fillEl = document.getElementById('gf-fill');
+  const hint = document.getElementById('gf-hint');
+  const wintextEl = document.getElementById('gf-wintext');
+  const stem = document.getElementById('gf-stem');
+  const leafLeft = document.getElementById('gf-leaf-left');
+  const leafRight = document.getElementById('gf-leaf-right');
+  const flowerGroup = document.getElementById('gf-flower');
+  const petals = document.getElementById('gf-petals');
+  const petalEls = Array.from(document.querySelectorAll('.gf-petal'));
+  const centerEl = document.getElementById('gf-center');
+
+  const stemLen = stem.getTotalLength();
+  stem.style.strokeDasharray = String(stemLen);
+  stem.style.strokeDashoffset = String(stemLen);
+  flowerGroup.style.opacity = '0';
+
+  let taps = 0;
+  let done = false;
+
+  function update(){
+    const pct = Math.min(1, taps / TAP_TARGET);
+    fillEl.style.width = (pct * 100) + '%';
+    stem.style.strokeDashoffset = String(stemLen * (1 - pct));
+
+    leafLeft.style.opacity = pct > 0.3 ? '1' : '0';
+    leafLeft.style.transform = pct > 0.3 ? 'scale(1)' : 'scale(0.2)';
+    leafRight.style.opacity = pct > 0.5 ? '1' : '0';
+    leafRight.style.transform = pct > 0.5 ? 'scale(1)' : 'scale(0.2)';
+
+    // la fleur suit exactement la pointe reelle de la tige (evite tout decalage)
+    const tip = stem.getPointAtLength(stemLen * pct);
+    const budScale = 0.6 + pct * 0.5;
+    flowerGroup.style.opacity = pct > 0.04 ? '1' : '0';
+    flowerGroup.setAttribute('transform', `translate(${tip.x},${tip.y}) scale(${budScale})`);
+
+    // le centre apparait tot, discret
+    centerEl.style.opacity = pct > 0.04 ? '1' : '0';
+
+    // les petales apparaissent un par un au fil des taps (a partir de 15% de progression)
+    const petalStart = 0.15;
+    const petalRange = 1 - petalStart;
+    petalEls.forEach((p, i) => {
+      const threshold = petalStart + (i / petalEls.length) * petalRange;
+      p.classList.toggle('shown', pct >= threshold);
+    });
+
+    if(pct >= 1 && !done){
+      done = true;
+      bloom();
+    }
+  }
+
+  function bloom(){
+    wrap.classList.add('bloomed');
+    petals.classList.add('open');
+    hint.remove();
+    sun.classList.add('resting');
+    setTimeout(() => { wintextEl.classList.add('show'); }, 900);
+  }
+
+  function onTap(){
+    if(done) return;
+    taps++;
+    hint.classList.add('fading');
+    sun.classList.remove('bounce');
+    void sun.offsetWidth;
+    sun.classList.add('bounce');
+    spawnSparkle();
+    update();
+  }
+
+  function spawnSparkle(){
+    const rect = sun.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    for(let i = 0; i < 3; i++){
+      const s = document.createElement('div');
+      s.className = 'gf-sparkle';
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 24;
+      s.style.left = (rect.left - wrapRect.left + rect.width / 2) + 'px';
+      s.style.top = (rect.top - wrapRect.top + rect.height / 2) + 'px';
+      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      wrap.appendChild(s);
+      setTimeout(() => s.remove(), 700);
+    }
+  }
+
+  sun.addEventListener('click', onTap);
+  update();
+
+  dayCleanup = () => {
+    sun.removeEventListener('click', onTap);
+  };
+}
+
+
+/* ---------- CHAT ET PELOTE ---------- */
+function initYarnCat(data, dayNum){
+  const root = document.getElementById('yarncat-root');
+  const TAP_TARGET = 12;
+
+  function heartWaypoints(n, cx, cy, scale){
+    const pts = [];
+    for(let i = 0; i < n; i++){
+      const t = (2 * Math.PI * i) / (n - 1);
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      pts.push({ x: cx + x * scale, y: cy - y * scale });
+    }
+    return pts;
+  }
+  const WP = heartWaypoints(40, 150, 195, 8.2);
+  const pathD = 'M' + WP.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L') + ' Z';
+
+  root.innerHTML = `
+    <div class="yc-wrap" id="yc-wrap">
+      <svg class="yc-scene" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="yc-floor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff6ea"/>
+            <stop offset="100%" stop-color="#f6dbe4"/>
+          </linearGradient>
+        </defs>
+        <rect width="300" height="400" fill="url(#yc-floor)"/>
+        <path id="yc-thread" d="${pathD}" fill="none" stroke="#e05c88" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" opacity="0"/>
+        <text id="yc-cat" x="34" y="335" font-size="50">🐱</text>
+      </svg>
+      <div class="yc-ball" id="yc-ball">🧶</div>
+      <div class="yc-counter" id="yc-counter">${TAP_TARGET}</div>
+      <div class="yc-hint" id="yc-hint">Touche la pelote</div>
+      <div class="yc-wintext-overlay" id="yc-wintext-overlay">
+        <div class="yc-wintext" id="yc-wintext">${data.winText}</div>
+      </div>
+    </div>
+  `;
+
+  const wrap = document.getElementById('yc-wrap');
+  const ball = document.getElementById('yc-ball');
+  const thread = document.getElementById('yc-thread');
+  const cat = document.getElementById('yc-cat');
+  const hint = document.getElementById('yc-hint');
+  const wintextEl = document.getElementById('yc-wintext');
+  const counterEl = document.getElementById('yc-counter');
+
+  const threadLen = thread.getTotalLength();
+  thread.style.strokeDasharray = String(threadLen);
+  thread.style.strokeDashoffset = String(threadLen);
+
+  let w = 0, h = 0;
+  function sizeAll(){
+    const rect = wrap.getBoundingClientRect();
+    w = rect.width; h = rect.height;
+  }
+  sizeAll();
+  window.addEventListener('resize', sizeAll);
+
+  let taps = 0;
+  let done = false;
+  let moving = false;
+
+  function placeBallRandom(){
+    // evite le coin en bas a gauche ou se trouve le chat
+    const marginX = w * 0.14, marginY = h * 0.12;
+    let x, y;
+    do {
+      x = marginX + Math.random() * (w - marginX * 2);
+      y = marginY + Math.random() * (h - marginY * 2 - h * 0.15);
+    } while(x < w * 0.28 && y > h * 0.68);
+    ball.style.left = x + 'px';
+    ball.style.top = y + 'px';
+  }
+  placeBallRandom();
+
+  function catReact(){
+    cat.classList.remove('yc-react');
+    void cat.getBBox();
+    cat.classList.add('yc-react');
+  }
+
+  function onTap(){
+    if(done || moving) return;
+    taps++;
+    hint.classList.add('fading');
+    catReact();
+
+    if(taps >= TAP_TARGET){
+      finish();
+      return;
+    }
+
+    moving = true;
+    ball.classList.add('yc-caught');
+    setTimeout(() => {
+      ball.classList.remove('yc-caught');
+      placeBallRandom();
+      moving = false;
+    }, 260);
+  }
+
+  function finish(){
+    done = true;
+    ball.classList.add('yc-gone');
+    setTimeout(() => {
+      thread.style.transition = 'opacity 0.3s ease';
+      thread.style.opacity = '1';
+      thread.style.transition += ', stroke-dashoffset 1.3s cubic-bezier(.3,.6,.25,1)';
+      requestAnimationFrame(() => { thread.style.strokeDashoffset = '0'; });
+      cat.classList.add('yc-happy');
+      wrap.classList.add('done');
+      setTimeout(() => { wintextEl.classList.add('show'); }, 1500);
+    }, 350);
+  }
+
+  ball.addEventListener('click', onTap);
+
+  dayCleanup = () => {
+    window.removeEventListener('resize', sizeAll);
+    ball.removeEventListener('click', onTap);
+  };
+}
+
 
 /* ---------- MACHINE A SOUS ---------- */
 function initSlotMachine(data, dayNum){
