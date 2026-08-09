@@ -1,8 +1,3 @@
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -1824,6 +1819,652 @@
   }
   .yc-wintext.show{ opacity: 1; transform: scale(1); }
 
+  /* ---------- FEU DE CAMP ---------- */
+  .campfire-scene {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0c1128 0%, #171233 45%, #2a1a3a 100%);
+    font-family: var(--sans, sans-serif);
+    user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+    isolation: isolate;
+  }
+
+  .cf-progress-wrap {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    height: 6px;
+    z-index: 10;
+  }
+  .cf-progress-bar {
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cf-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #d98ba8, #f4a95f);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .cf-sky {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .cf-star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.25;
+    animation: cf-twinkle 3.2s ease-in-out infinite;
+  }
+  @keyframes cf-twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 0.95; transform: scale(1.15); }
+  }
+  .cf-moon {
+    position: absolute;
+    top: 40px;
+    right: 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #f3ecd8;
+    box-shadow: 0 0 18px 4px rgba(243,236,216,0.35);
+    opacity: 0.85;
+  }
+
+  .cf-trees {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    height: 42%;
+    z-index: 2;
+  }
+  .cf-trees-svg { width: 100%; height: 100%; display: block; }
+  .cf-tree-back { fill: #10162e; opacity: 0.85; }
+  .cf-tree-front { fill: #0a0e22; }
+
+  .cf-glow {
+    position: absolute;
+    left: 50%;
+    bottom: 14%;
+    width: 40px;
+    height: 40px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,150,60,0.9) 0%, rgba(255,120,40,0.35) 40%, rgba(255,120,40,0) 70%);
+    opacity: 0;
+    filter: blur(2px);
+    transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .cf-fire-wrap {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    width: 46%;
+    max-width: 190px;
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+  .cf-wood-svg {
+    position: relative;
+    width: 100%;
+    display: block;
+    z-index: 4;
+  }
+  .cf-wood-shadow { fill: rgba(0,0,0,0.35); }
+  .cf-log { fill: #3d2418; stroke: #241309; stroke-width: 1; }
+  .cf-log-2, .cf-log-3 { fill: #331d13; }
+
+  .cf-flame-svg {
+    position: absolute;
+    bottom: 22%;
+    left: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .cf-flame {
+    transform-origin: 80px 200px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .cf-flame-outer { fill: #ff7a30; opacity: 0; }
+  .cf-flame-mid   { fill: #ffb14d; opacity: 0; }
+  .cf-flame-inner { fill: #fff1c2; opacity: 0; }
+  .cf-ember       { fill: #ff5a1f; opacity: 0; transition: opacity 0.5s ease; }
+
+  .cf-spark {
+    fill: #ffd28a;
+    opacity: 0;
+  }
+
+  @keyframes cf-flicker-outer {
+    0%   { transform: scaleY(1) scaleX(1) translateX(0) rotate(0deg); }
+    25%  { transform: scaleY(1.06) scaleX(0.96) translateX(-2px) rotate(-1.5deg); }
+    50%  { transform: scaleY(0.95) scaleX(1.04) translateX(2px) rotate(1.5deg); }
+    75%  { transform: scaleY(1.08) scaleX(0.97) translateX(-1px) rotate(-1deg); }
+    100% { transform: scaleY(1) scaleX(1) translateX(0) rotate(0deg); }
+  }
+  @keyframes cf-flicker-mid {
+    0%   { transform: scaleY(1) translateX(0); }
+    30%  { transform: scaleY(0.92) translateX(2px); }
+    60%  { transform: scaleY(1.08) translateX(-2px); }
+    100% { transform: scaleY(1) translateX(0); }
+  }
+  @keyframes cf-flicker-inner {
+    0%   { transform: scaleY(1) translateX(0); }
+    40%  { transform: scaleY(1.1) translateX(-1.5px); }
+    70%  { transform: scaleY(0.9) translateX(1.5px); }
+    100% { transform: scaleY(1) translateX(0); }
+  }
+  @keyframes cf-spark-rise {
+    0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+    15%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+  }
+  .cf-spark { animation: cf-spark-rise 0.9s ease-out forwards; }
+
+  .cf-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    text-align: center;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+    z-index: 8;
+    transition: opacity 0.6s ease;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
+  .cf-hint-hidden { opacity: 0; pointer-events: none; }
+
+  .cf-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s ease;
+    z-index: 20;
+  }
+  .cf-overlay-visible { opacity: 1; pointer-events: auto; }
+  .cf-overlay-veil {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 62%, rgba(255,140,60,0.25) 0%, rgba(10,10,25,0.55) 55%, rgba(5,5,15,0.75) 100%);
+  }
+  .cf-overlay-text {
+    position: relative;
+    z-index: 1;
+    font-family: var(--serif, serif);
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #fff3e6;
+    text-align: center;
+    text-shadow: 0 0 18px rgba(255,150,70,0.6), 0 2px 6px rgba(0,0,0,0.5);
+    max-width: 320px;
+  }
+
+  .campfire-scene[data-stage="1"] .cf-flame-inner { opacity: 0.5; animation: cf-flicker-inner 0.9s ease-in-out infinite; }
+  .campfire-scene[data-stage="1"] .cf-ember { opacity: 0.6; }
+  .campfire-scene[data-stage="1"] .cf-flame { transform: scale(0.15) translateY(60px); }
+  .campfire-scene[data-stage="1"] .cf-glow { width: 60px; height: 60px; opacity: 0.4; }
+
+  .campfire-scene[data-stage="2"] .cf-flame-inner { opacity: 0.85; animation: cf-flicker-inner 0.85s ease-in-out infinite; transform: scale(0.4) translateY(35px); }
+  .campfire-scene[data-stage="2"] .cf-flame-mid { opacity: 0.6; animation: cf-flicker-mid 1s ease-in-out infinite; transform: scale(0.35) translateY(38px); }
+  .campfire-scene[data-stage="2"] .cf-ember { opacity: 0.8; }
+  .campfire-scene[data-stage="2"] .cf-glow { width: 110px; height: 110px; opacity: 0.55; }
+
+  .campfire-scene[data-stage="3"] .cf-flame-inner { opacity: 0.9; animation: cf-flicker-inner 0.8s ease-in-out infinite; transform: scale(0.6) translateY(20px); }
+  .campfire-scene[data-stage="3"] .cf-flame-mid { opacity: 0.8; animation: cf-flicker-mid 0.95s ease-in-out infinite; transform: scale(0.6) translateY(22px); }
+  .campfire-scene[data-stage="3"] .cf-flame-outer { opacity: 0.55; animation: cf-flicker-outer 1.1s ease-in-out infinite; transform: scale(0.55) translateY(24px); }
+  .campfire-scene[data-stage="3"] .cf-ember { opacity: 0.9; }
+  .campfire-scene[data-stage="3"] .cf-glow { width: 170px; height: 170px; opacity: 0.65; }
+
+  .campfire-scene[data-stage="4"] .cf-flame-inner { opacity: 1; animation: cf-flicker-inner 0.75s ease-in-out infinite; transform: scale(0.82) translateY(8px); }
+  .campfire-scene[data-stage="4"] .cf-flame-mid { opacity: 0.9; animation: cf-flicker-mid 0.9s ease-in-out infinite; transform: scale(0.82) translateY(10px); }
+  .campfire-scene[data-stage="4"] .cf-flame-outer { opacity: 0.8; animation: cf-flicker-outer 1s ease-in-out infinite; transform: scale(0.78) translateY(10px); }
+  .campfire-scene[data-stage="4"] .cf-ember { opacity: 1; }
+  .campfire-scene[data-stage="4"] .cf-glow { width: 230px; height: 230px; opacity: 0.75; }
+
+  .campfire-scene[data-stage="5"] .cf-flame-inner,
+  .campfire-scene[data-stage="6"] .cf-flame-inner { opacity: 1; animation: cf-flicker-inner 0.7s ease-in-out infinite; transform: scale(1) translateY(0); }
+  .campfire-scene[data-stage="5"] .cf-flame-mid,
+  .campfire-scene[data-stage="6"] .cf-flame-mid { opacity: 1; animation: cf-flicker-mid 0.85s ease-in-out infinite; transform: scale(1) translateY(0); }
+  .campfire-scene[data-stage="5"] .cf-flame-outer,
+  .campfire-scene[data-stage="6"] .cf-flame-outer { opacity: 0.95; animation: cf-flicker-outer 0.95s ease-in-out infinite; transform: scale(1) translateY(0); }
+  .campfire-scene[data-stage="5"] .cf-ember,
+  .campfire-scene[data-stage="6"] .cf-ember { opacity: 1; }
+  .campfire-scene[data-stage="5"] .cf-glow,
+  .campfire-scene[data-stage="6"] .cf-glow { width: 300px; height: 300px; opacity: 0.9; }
+
+  .campfire-scene[data-stage="6"] .cf-log { filter: brightness(1.3) saturate(1.2); }
+
+  /* ---------- COQUILLAGES ---------- */
+  .sh-scene {
+    --sh-sand: #ecd8b8;
+    --sh-sand-dark: #d9c19a;
+    --sh-water: #9fd3d0;
+    --sh-water-deep: #7cbcb9;
+    --sh-sky: #fbeee2;
+
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--sh-sky);
+    box-shadow: 0 8px 24px rgba(74, 59, 66, 0.15);
+    font-family: var(--sans);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .sh-sky {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 100%;
+    background: linear-gradient(180deg, var(--sh-sky) 0%, var(--sh-sky) 100%);
+  }
+
+  .sh-sand-zone {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 78%;
+    z-index: 1;
+  }
+
+  .sh-sand-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .sh-shells-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+
+  .sh-water-zone {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 34%;
+    z-index: 3;
+    cursor: pointer;
+    overflow: visible;
+  }
+
+  .sh-water-svg {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .sh-water-base {
+    fill: var(--sh-water);
+    opacity: 0.9;
+  }
+
+  .sh-waves-layer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 140%;
+    pointer-events: none;
+  }
+
+  .sh-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(-6%) scaleY(0.6);
+    transform-origin: bottom center;
+  }
+
+  .sh-wave svg path {
+    fill: var(--sh-water-deep);
+    opacity: 0.85;
+  }
+
+  .sh-wave-active {
+    animation: sh-wave-anim 1.1s ease-out forwards;
+  }
+
+  @keyframes sh-wave-anim {
+    0% {
+      opacity: 0;
+      transform: translateX(-6%) scaleY(0.6);
+    }
+    35% {
+      opacity: 0.9;
+      transform: translateX(2%) scaleY(1.15);
+    }
+    70% {
+      opacity: 0.7;
+      transform: translateX(0%) scaleY(0.95);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-4%) scaleY(0.6);
+    }
+  }
+
+  .sh-shell {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    margin-left: -17px;
+    margin-top: -17px;
+    opacity: 0;
+    transform: scale(0.3) translateY(-14px) rotate(var(--sh-rot, 0deg));
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.34,1.56,.64,1);
+    perspective: 400px;
+  }
+
+  .sh-shell-show {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(var(--sh-rot, 0deg));
+  }
+
+  .sh-shell-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.4,.2,.2,1);
+  }
+
+  .sh-shell-flipped .sh-shell-inner {
+    transform: rotateY(180deg);
+  }
+
+  .sh-shell-front,
+  .sh-shell-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sh-shell-front path,
+  .sh-shell-front circle {
+    fill: #fff6ea;
+    stroke: var(--accent);
+    stroke-width: 1;
+  }
+
+  .sh-shell-back {
+    transform: rotateY(180deg);
+    background: var(--accent);
+    border-radius: 50%;
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 9px;
+    text-align: center;
+    line-height: 1.1;
+    padding: 3px;
+    box-sizing: border-box;
+  }
+
+  .sh-shell-dot {
+    font-size: 12px;
+  }
+
+  .sh-hint {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin: 0;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    color: var(--ink);
+    opacity: 0.75;
+    z-index: 5;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .sh-hint-hidden {
+    opacity: 0;
+  }
+
+  .sh-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 59, 66, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: background 0.6s ease, opacity 0.6s ease;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+
+  .sh-overlay-visible {
+    background: rgba(74, 59, 66, 0.45);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sh-overlay-card {
+    background: var(--bg, #fdf3f6);
+    border-radius: 16px;
+    padding: 24px 20px;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .sh-overlay-text {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+    min-height: 3em;
+  }
+
+  /* ---------- BOULE A NEIGE ---------- */
+  .sg-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    font-family: var(--sans);
+    color: var(--ink);
+    text-align: center;
+  }
+
+  .sg-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #fdf3f6 0%, #f7e2ea 55%, #f0d3df 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(74, 59, 66, 0.12);
+    padding-bottom: 12%;
+    box-sizing: border-box;
+  }
+
+  .sg-globe {
+    position: relative;
+    width: 68%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    transition: transform 0.15s ease;
+  }
+
+  .sg-globe:active {
+    cursor: grabbing;
+  }
+
+  .sg-globe--pulse {
+    animation: sg-pulse 0.5s ease;
+  }
+
+  @keyframes sg-pulse {
+    0%   { transform: scale(1) rotate(0deg); }
+    20%  { transform: scale(1.03) rotate(-3deg); }
+    40%  { transform: scale(0.98) rotate(3deg); }
+    60%  { transform: scale(1.02) rotate(-2deg); }
+    80%  { transform: scale(1) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .sg-glass {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fdf3f6;
+    box-shadow:
+      inset 0 -10px 20px rgba(74, 59, 66, 0.15),
+      inset 0 8px 16px rgba(255, 255, 255, 0.6),
+      0 10px 22px rgba(74, 59, 66, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .sg-scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .sg-flakes-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .sg-flake {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #ffffff;
+    border-radius: 50%;
+    will-change: transform;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+  }
+
+  .sg-shine {
+    position: absolute;
+    top: 8%;
+    left: 14%;
+    width: 30%;
+    height: 20%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: rotate(-20deg);
+  }
+
+  .sg-base {
+    width: 40%;
+    height: 8%;
+    margin-top: -2%;
+    background: linear-gradient(180deg, #d98ba8 0%, #c17693 100%);
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 4px 8px rgba(74, 59, 66, 0.2);
+  }
+
+  .sg-hint {
+    position: absolute;
+    bottom: 6%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--ink);
+    opacity: 0.65;
+    margin: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .sg-hint--hidden {
+    opacity: 0;
+  }
+
+  .sg-message {
+    margin-top: 20px;
+    min-height: 60px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid rgba(217, 139, 168, 0.25);
+    box-shadow: 0 6px 18px rgba(74, 59, 66, 0.08);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .sg-message--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .sg-message p {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.5;
+  }
+
   /* ---------- MACHINE A SOUS ---------- */
   .slot-wrap{ display:flex; flex-direction:column; align-items:center; }
   .slot-machine{
@@ -3305,6 +3946,27 @@ const CONTENT = {
     text: "Le chat s'ennuie. Touche la pelote, encore et encore.",
     winText: "Meme en jouant, tout finit toujours par former un coeur. ❤️"
   },
+  33: {
+    type: "balloons",
+    text: "Chaque ballon garde une lettre en otage.<br><br>Fais-les s'envoler un par un, et regarde ce qui reste flotter au milieu.",
+    word: "LEGERE",
+    winText: "Voila ce que tu fais de moi depuis le debut. <br><br>Plus rien ne pese, tout devient possible. ❤️"
+  },
+  34: {
+    type: "campfire",
+    text: "Touche l'ecran plusieurs fois pour raviver le feu, doucement, jusqu'a ce qu'il prenne vraiment.",
+    winText: "Avec toi, meme le silence a quelque chose de chaud. ❤️"
+  },
+  37: {
+    type: "seashells",
+    text: "Touche l'eau pour laisser venir les vagues.",
+    winText: "Chaque coquillage est un jour ou je t'ai choisie. La mer repart toujours, mais nous, on reste. ❤️"
+  },
+  38: {
+    type: "snowglobe",
+    text: "Secoue doucement ce petit monde fige dans le verre.",
+    winText: "Comme ces flocons, cet instant avec toi s'est fige pour toujours en moi ❤️"
+  },
   47: { type: "memory", text: "PLACEHOLDER — message special du dernier jour.", photo: null }
 };
 
@@ -3336,7 +3998,11 @@ const TAG_LABELS = {
   runner: "Petit jeu",
   safe: "Petit jeu",
   growflower: "Petit jeu",
-  yarncat: "Petit jeu"
+  yarncat: "Petit jeu",
+  balloons: "Petit jeu",
+  campfire: "Petit jeu",
+  seashells: "Petit jeu",
+  snowglobe: "Petit jeu"
 };
 
 /* ==================================================== */
@@ -3567,6 +4233,42 @@ function showDay(day){
       <div id="yarncat-root"></div>
     `;
     initYarnCat(data, day);
+  } else if(data.type === 'balloons'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.balloons}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="balloons-root"></div>
+    `;
+    initBalloons(data, day);
+  } else if(data.type === 'campfire'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.campfire}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="campfire-root"></div>
+    `;
+    initCampfire(data, day);
+  } else if(data.type === 'seashells'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.seashells}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="seashells-root"></div>
+    `;
+    initSeashells(data, day);
+  } else if(data.type === 'snowglobe'){
+    card.innerHTML = `
+      <div class="drag-handle"></div>
+      <div class="close-card" onclick="closeDay()">&times;</div>
+      <div class="content-tag reveal" style="animation-delay:0s;">${TAG_LABELS.snowglobe}</div>
+      <div class="memory-intro reveal" style="animation-delay:0.1s;">${data.text}</div>
+      <div id="snowglobe-root"></div>
+    `;
+    initSnowglobe(data, day);
   } else if(data.type === 'rapport'){
     card.innerHTML = `
       <div class="drag-handle"></div>
@@ -5921,6 +6623,864 @@ function initYarnCat(data, dayNum){
   };
 }
 
+
+
+/* ---------- BALLONS ---------- */
+function initBalloons(data, dayNum) {
+  const root = document.getElementById('balloons-root');
+  if (!root) return;
+
+  const word = (data.word || '').toUpperCase();
+  const letters = word.split('');
+  const colors = ['#d98ba8', '#f0a8c0', '#e6a4b8', '#c97fa0', '#f2b9cf', '#dd97ae', '#e8aec4'];
+
+  let poppedCount = 0;
+  let hasInteracted = false;
+
+  root.innerHTML = `
+    <style>
+      #balloons-root .bln-scene {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        aspect-ratio: 3 / 4;
+        margin: 0 auto;
+        border-radius: 20px;
+        background: linear-gradient(160deg, #fdf3f6 0%, #f6dbe4 55%, #f2c9da 100%);
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(74,59,66,0.12);
+        font-family: var(--sans, 'Inter', sans-serif);
+      }
+
+      #balloons-root .bln-hint {
+        position: absolute;
+        top: 14px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-family: var(--sans, 'Inter', sans-serif);
+        font-size: 0.85rem;
+        color: var(--ink, #4a3b42);
+        opacity: 0.65;
+        letter-spacing: 0.02em;
+        transition: opacity 0.5s ease;
+        z-index: 5;
+        pointer-events: none;
+      }
+      #balloons-root .bln-hint.hidden { opacity: 0; }
+
+      #balloons-root .bln-row {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 2%;
+        padding: 60px 4% 30px;
+        flex-wrap: wrap;
+        align-content: flex-end;
+      }
+
+      #balloons-root .balloon {
+        position: relative;
+        width: 15%;
+        min-width: 44px;
+        max-width: 62px;
+        aspect-ratio: 0.82 / 1;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        animation: bln-float 3.6s ease-in-out infinite;
+        transition: transform 0.15s ease;
+      }
+      #balloons-root .balloon:active { transform: scale(0.93); }
+      #balloons-root .balloon.popped { pointer-events: none; }
+
+      @keyframes bln-float {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        50% { transform: translateY(-10px) rotate(2deg); }
+      }
+
+      #balloons-root .balloon svg { width: 100%; height: 100%; overflow: visible; display: block; }
+
+      #balloons-root .balloon-letter {
+        font-family: var(--sans, 'Inter', sans-serif);
+        font-weight: 700;
+        fill: #fff;
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+
+      #balloons-root .bln-pop-frag {
+        position: absolute;
+        border-radius: 2px;
+        opacity: 1;
+        will-change: transform, opacity;
+      }
+
+      #balloons-root .bln-center-wrap {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      #balloons-root .bln-word {
+        display: flex;
+        gap: 4px;
+      }
+
+      #balloons-root .bln-word-letter {
+        font-family: var(--serif, 'Fraunces', serif);
+        font-size: clamp(1.8rem, 8vw, 2.6rem);
+        color: var(--accent, #d98ba8);
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(24px) scale(0.5);
+        transition: opacity 0.55s cubic-bezier(.2,.9,.25,1.2), transform 0.55s cubic-bezier(.2,.9,.25,1.2);
+      }
+      #balloons-root .bln-word-letter.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      #balloons-root .bln-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(74,59,66,0.28);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+        z-index: 10;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      #balloons-root .bln-overlay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      #balloons-root .bln-overlay-card {
+        background: linear-gradient(160deg, #fff 0%, #fdf3f6 100%);
+        border-radius: 18px;
+        padding: 28px 24px;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 12px 40px rgba(74,59,66,0.25);
+        transform: scale(0.85) translateY(10px);
+        opacity: 0;
+        transition: transform 0.5s cubic-bezier(.2,.9,.25,1.2), opacity 0.5s ease;
+      }
+      #balloons-root .bln-overlay.show .bln-overlay-card {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+
+      #balloons-root .bln-overlay-word {
+        font-family: var(--serif, 'Fraunces', serif);
+        font-size: 1.4rem;
+        color: var(--accent, #d98ba8);
+        letter-spacing: 0.08em;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      #balloons-root .bln-overlay-text {
+        font-family: var(--serif, 'Fraunces', serif);
+        font-size: 1rem;
+        line-height: 1.55;
+        color: var(--ink, #4a3b42);
+      }
+    </style>
+
+    <div class="bln-scene">
+      <div class="bln-hint" id="bln-hint-${dayNum}">Touche les ballons</div>
+      <div class="bln-row" id="bln-row-${dayNum}"></div>
+      <div class="bln-center-wrap">
+        <div class="bln-word" id="bln-word-${dayNum}"></div>
+      </div>
+      <div class="bln-overlay" id="bln-overlay-${dayNum}">
+        <div class="bln-overlay-card">
+          <div class="bln-overlay-word">${word.split('').join(' ')}</div>
+          <div class="bln-overlay-text">${data.winText || ''}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const rowEl = root.querySelector(`#bln-row-${dayNum}`);
+  const hintEl = root.querySelector(`#bln-hint-${dayNum}`);
+  const wordEl = root.querySelector(`#bln-word-${dayNum}`);
+  const overlayEl = root.querySelector(`#bln-overlay-${dayNum}`);
+  const sceneEl = root.querySelector('.bln-scene');
+
+  const letterSlots = [];
+  letters.forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'bln-word-letter';
+    span.textContent = ch;
+    wordEl.appendChild(span);
+    letterSlots.push(span);
+  });
+
+  letters.forEach((ch, i) => {
+    const color = colors[i % colors.length];
+    const balloon = document.createElement('div');
+    balloon.className = 'balloon';
+    balloon.style.animationDelay = (i * 0.25) + 's';
+    balloon.dataset.index = i;
+
+    balloon.innerHTML = `
+      <svg viewBox="0 0 100 130">
+        <ellipse cx="50" cy="46" rx="42" ry="46" fill="${color}"></ellipse>
+        <ellipse cx="36" cy="28" rx="10" ry="14" fill="rgba(255,255,255,0.35)"></ellipse>
+        <polygon points="44,90 56,90 50,102" fill="${color}"></polygon>
+        <line x1="50" y1="102" x2="50" y2="128" stroke="${color}" stroke-width="1.5" opacity="0.6"></line>
+        <text x="50" y="48" font-size="34" class="balloon-letter">${ch}</text>
+      </svg>
+    `;
+
+    const handlePop = (e) => {
+      e.preventDefault();
+      if (balloon.classList.contains('popped')) return;
+      popBalloon(balloon, i, color);
+    };
+
+    balloon.addEventListener('click', handlePop);
+    balloon.addEventListener('touchstart', handlePop, { passive: false });
+
+    rowEl.appendChild(balloon);
+  });
+
+  function markInteracted() {
+    if (hasInteracted) return;
+    hasInteracted = true;
+    hintEl.classList.add('hidden');
+  }
+
+  function popBalloon(balloon, index, color) {
+    markInteracted();
+    balloon.classList.add('popped');
+
+    const rect = balloon.getBoundingClientRect();
+    const sceneRect = sceneEl.getBoundingClientRect();
+    const cx = rect.left - sceneRect.left + rect.width / 2;
+    const cy = rect.top - sceneRect.top + rect.height / 2;
+
+    spawnFragments(cx, cy, color);
+
+    balloon.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+    balloon.style.transform = 'scale(1.15)';
+    balloon.style.opacity = '0';
+    setTimeout(() => { balloon.style.display = 'none'; }, 160);
+
+    letterSlots[index].classList.add('show');
+
+    poppedCount++;
+    if (poppedCount === letters.length) {
+      setTimeout(showFinalOverlay, 700);
+    }
+  }
+
+  function spawnFragments(cx, cy, color) {
+    const fragCount = 10;
+    for (let i = 0; i < fragCount; i++) {
+      const frag = document.createElement('div');
+      frag.className = 'bln-pop-frag';
+      const size = 4 + Math.random() * 5;
+      frag.style.width = size + 'px';
+      frag.style.height = size + 'px';
+      frag.style.left = cx + 'px';
+      frag.style.top = cy + 'px';
+      frag.style.background = color;
+
+      const angle = (Math.PI * 2 * i) / fragCount + Math.random() * 0.5;
+      const dist = 30 + Math.random() * 40;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+      const rot = Math.random() * 360;
+
+      sceneEl.appendChild(frag);
+
+      frag.animate([
+        { transform: 'translate(-50%,-50%) translate(0,0) rotate(0deg)', opacity: 1 },
+        { transform: `translate(-50%,-50%) translate(${dx}px, ${dy}px) rotate(${rot}deg)`, opacity: 0 }
+      ], {
+        duration: 550 + Math.random() * 200,
+        easing: 'cubic-bezier(.2,.7,.3,1)',
+        fill: 'forwards'
+      });
+
+      setTimeout(() => frag.remove(), 800);
+    }
+  }
+
+  function showFinalOverlay() {
+    overlayEl.classList.add('show');
+  }
+
+  dayCleanup = () => {
+    root.innerHTML = '';
+  };
+}
+
+
+/* ---------- FEU DE CAMP ---------- */
+function initCampfire(data, dayNum) {
+  const root = document.getElementById('campfire-root');
+  if (!root) return;
+
+  const TOTAL_STEPS = 6;
+  let step = 0;
+  let firstInteraction = false;
+  let finished = false;
+
+  root.innerHTML = `
+    <div class="campfire-scene" data-day="${dayNum}">
+      <div class="cf-progress-wrap" aria-hidden="true">
+        <div class="cf-progress-bar"><div class="cf-progress-fill"></div></div>
+      </div>
+
+      <div class="cf-sky">
+        ${Array.from({length: 26}).map(() => {
+          const top = Math.random() * 55;
+          const left = Math.random() * 100;
+          const delay = (Math.random() * 4).toFixed(2);
+          const size = (Math.random() * 1.6 + 0.6).toFixed(2);
+          return `<span class="cf-star" style="top:${top}%;left:${left}%;animation-delay:${delay}s;width:${size}px;height:${size}px;"></span>`;
+        }).join('')}
+        <div class="cf-moon"></div>
+      </div>
+
+      <div class="cf-trees">
+        <svg viewBox="0 0 400 160" preserveAspectRatio="none" class="cf-trees-svg">
+          <path d="M0,160 L0,90 L30,40 L45,90 L60,55 L75,90 L95,20 L115,90 L135,60 L150,90 L170,45 L185,90 L200,70 L200,160 Z" class="cf-tree-back"/>
+          <path d="M200,160 L200,80 L215,50 L232,80 L250,30 L268,80 L285,55 L300,80 L320,45 L338,80 L355,60 L370,80 L400,80 L400,160 Z" class="cf-tree-front"/>
+        </svg>
+      </div>
+
+      <div class="cf-glow"></div>
+
+      <div class="cf-fire-wrap">
+        <svg viewBox="0 0 200 200" class="cf-wood-svg">
+          <ellipse cx="100" cy="172" rx="62" ry="10" class="cf-wood-shadow"/>
+          <rect x="40" y="150" width="120" height="12" rx="6" class="cf-log cf-log-1"/>
+          <rect x="48" y="150" width="120" height="12" rx="6" class="cf-log cf-log-2" transform="rotate(18 108 156)"/>
+          <rect x="44" y="150" width="118" height="12" rx="6" class="cf-log cf-log-3" transform="rotate(-16 103 156)"/>
+        </svg>
+
+        <svg viewBox="0 0 160 220" class="cf-flame-svg">
+          <g class="cf-spark-group"></g>
+          <path class="cf-flame cf-flame-outer" d="M80,210 C40,190 30,150 55,110 C40,120 35,90 55,60 C60,90 75,80 78,55 C95,85 100,60 92,35 C120,55 128,100 108,130 C130,120 128,155 108,170 C118,180 108,205 80,210 Z"/>
+          <path class="cf-flame cf-flame-mid" d="M80,205 C55,190 50,160 65,130 C58,138 55,115 68,95 C72,112 80,108 82,90 C92,108 96,92 90,72 C108,88 112,118 98,138 C112,132 112,155 98,168 C104,176 98,196 80,205 Z"/>
+          <path class="cf-flame cf-flame-inner" d="M80,198 C68,188 66,168 76,150 C72,155 70,140 78,128 C80,138 85,135 86,124 C93,136 95,124 91,112 C102,122 104,142 96,155 C104,150 104,165 96,174 C99,180 94,193 80,198 Z"/>
+          <ellipse class="cf-ember" cx="80" cy="205" rx="26" ry="7"/>
+        </svg>
+      </div>
+
+      <p class="cf-hint">Touche l'ecran, encore et encore</p>
+
+      <div class="cf-overlay">
+        <div class="cf-overlay-veil"></div>
+        <p class="cf-overlay-text">${escapeHtmlCf(data.winText)}</p>
+      </div>
+    </div>
+  `;
+
+  function escapeHtmlCf(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  const scene = root.querySelector('.campfire-scene');
+  const hint = root.querySelector('.cf-hint');
+  const fill = root.querySelector('.cf-progress-fill');
+  const overlay = root.querySelector('.cf-overlay');
+  const sparkGroup = root.querySelector('.cf-spark-group');
+
+  function spawnSpark(clientX, clientY) {
+    const svgRect = root.querySelector('.cf-flame-svg').getBoundingClientRect();
+    let cx = 80, cy = 150;
+    if (clientX != null && svgRect.width) {
+      const relX = (clientX - svgRect.left) / svgRect.width;
+      const relY = (clientY - svgRect.top) / svgRect.height;
+      cx = Math.min(Math.max(relX * 160, 20), 140);
+      cy = Math.min(Math.max(relY * 220, 40), 190);
+    }
+    const NS = 'http://www.w3.org/2000/svg';
+    const dot = document.createElementNS(NS, 'circle');
+    dot.setAttribute('cx', cx);
+    dot.setAttribute('cy', cy);
+    dot.setAttribute('r', (Math.random() * 2 + 1.5).toFixed(1));
+    dot.setAttribute('class', 'cf-spark');
+    dot.style.setProperty('--dx', `${(Math.random() * 40 - 20).toFixed(0)}px`);
+    dot.style.setProperty('--dy', `${-(Math.random() * 60 + 30).toFixed(0)}px`);
+    sparkGroup.appendChild(dot);
+    setTimeout(() => dot.remove(), 900);
+  }
+
+  function updateStage() {
+    scene.setAttribute('data-stage', String(step));
+    fill.style.width = `${(step / TOTAL_STEPS) * 100}%`;
+  }
+
+  function handleInteraction(e) {
+    if (finished) return;
+
+    if (!firstInteraction) {
+      firstInteraction = true;
+      hint.classList.add('cf-hint-hidden');
+    }
+
+    let x, y;
+    if (e.changedTouches && e.changedTouches.length) {
+      x = e.changedTouches[0].clientX;
+      y = e.changedTouches[0].clientY;
+    } else {
+      x = e.clientX;
+      y = e.clientY;
+    }
+
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => spawnSpark(x, y), i * 60);
+    }
+
+    step = Math.min(step + 1, TOTAL_STEPS);
+    updateStage();
+
+    if (step >= TOTAL_STEPS && !finished) {
+      finished = true;
+      setTimeout(() => {
+        overlay.classList.add('cf-overlay-visible');
+      }, 700);
+    }
+  }
+
+  scene.addEventListener('pointerdown', handleInteraction);
+  updateStage();
+
+  dayCleanup = () => {
+    scene.removeEventListener('pointerdown', handleInteraction);
+  };
+}
+
+
+/* ---------- COQUILLAGES ---------- */
+function initSeashells(data, dayNum) {
+  const root = document.getElementById('seashells-root');
+  root.innerHTML = '';
+
+  const SHELL_WORDS = [
+    "toi", "nous", "ici", "encore", "toujours",
+    "doucement", "pres de toi", "ce jour-la", "en secret", "pour de vrai"
+  ];
+  const TOTAL_SHELLS = 8;
+
+  const container = document.createElement('div');
+  container.className = 'sh-scene';
+  container.innerHTML = `
+    <div class="sh-sky"></div>
+    <div class="sh-sand-zone">
+      <svg class="sh-sand-svg" viewBox="0 0 300 400" preserveAspectRatio="none">
+        <path d="M0,60 Q150,20 300,60 L300,400 L0,400 Z" fill="var(--sh-sand)"></path>
+      </svg>
+      <div class="sh-shells-layer"></div>
+    </div>
+    <div class="sh-water-zone" role="button" tabindex="0" aria-label="Toucher l'eau">
+      <svg class="sh-water-svg" viewBox="0 0 300 120" preserveAspectRatio="none">
+        <path class="sh-water-base" d="M0,40 Q75,10 150,40 T300,40 L300,120 L0,120 Z"></path>
+      </svg>
+      <div class="sh-waves-layer"></div>
+    </div>
+    <p class="sh-hint">Touche l'eau</p>
+    <div class="sh-overlay">
+      <div class="sh-overlay-card">
+        <p class="sh-overlay-text"></p>
+      </div>
+    </div>
+  `;
+  root.appendChild(container);
+
+  const waterZone = container.querySelector('.sh-water-zone');
+  const wavesLayer = container.querySelector('.sh-waves-layer');
+  const shellsLayer = container.querySelector('.sh-shells-layer');
+  const hint = container.querySelector('.sh-hint');
+  const overlay = container.querySelector('.sh-overlay');
+  const overlayText = container.querySelector('.sh-overlay-text');
+
+  let shellCount = 0;
+  let firstInteraction = false;
+  let busy = false;
+  const usedPositions = [];
+  const usedWordIndices = [];
+  const timeouts = [];
+
+  function safeTimeout(fn, ms) {
+    const id = setTimeout(fn, ms);
+    timeouts.push(id);
+    return id;
+  }
+
+  function pickPosition() {
+    let x, y, tries = 0;
+    do {
+      x = 12 + Math.random() * 76;
+      y = 15 + Math.random() * 70;
+      tries++;
+    } while (
+      usedPositions.some(p => Math.hypot(p.x - x, p.y - y) < 18) &&
+      tries < 30
+    );
+    usedPositions.push({ x, y });
+    return { x, y };
+  }
+
+  function pickWordIndex() {
+    if (usedWordIndices.length >= SHELL_WORDS.length) return -1;
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * SHELL_WORDS.length);
+    } while (usedWordIndices.includes(idx));
+    usedWordIndices.push(idx);
+    return idx;
+  }
+
+  function shellSVG(variant) {
+    const shapes = [
+      `<path d="M12 2 C5 6 2 14 12 22 C22 14 19 6 12 2 Z" />`,
+      `<path d="M12 3 C4 8 3 16 12 21 C21 16 20 8 12 3 Z" />`,
+      `<circle cx="12" cy="12" r="9" />`
+    ];
+    return shapes[variant % shapes.length];
+  }
+
+  function spawnWave(onLand) {
+    const wave = document.createElement('div');
+    wave.className = 'sh-wave';
+    wave.innerHTML = `
+      <svg viewBox="0 0 300 60" preserveAspectRatio="none">
+        <path d="M0,30 Q75,0 150,30 T300,30 L300,60 L0,60 Z"></path>
+      </svg>
+    `;
+    wavesLayer.appendChild(wave);
+    requestAnimationFrame(() => wave.classList.add('sh-wave-active'));
+    wave.addEventListener('animationend', () => {
+      wave.remove();
+      if (onLand) onLand();
+    }, { once: true });
+  }
+
+  function dropShell() {
+    if (shellCount >= TOTAL_SHELLS) return;
+    const pos = pickPosition();
+    const hasWord = Math.random() < 0.7;
+    const wordIdx = hasWord ? pickWordIndex() : -1;
+    const word = wordIdx >= 0 ? SHELL_WORDS[wordIdx] : null;
+    const variant = shellCount;
+    const rotation = (Math.random() * 40 - 20).toFixed(1);
+
+    const shell = document.createElement('div');
+    shell.className = 'sh-shell';
+    shell.style.left = pos.x + '%';
+    shell.style.top = pos.y + '%';
+    shell.style.setProperty('--sh-rot', rotation + 'deg');
+
+    shell.innerHTML = `
+      <div class="sh-shell-inner">
+        <svg class="sh-shell-front" viewBox="0 0 24 24">${shellSVG(variant)}</svg>
+        <div class="sh-shell-back">${word ? `<span>${word}</span>` : `<span class="sh-shell-dot">✦</span>`}</div>
+      </div>
+    `;
+    shellsLayer.appendChild(shell);
+
+    requestAnimationFrame(() => shell.classList.add('sh-shell-show'));
+
+    if (word) {
+      shell.style.cursor = 'pointer';
+      shell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        shell.classList.toggle('sh-shell-flipped');
+      });
+    }
+
+    shellCount++;
+    if (shellCount >= TOTAL_SHELLS) {
+      safeTimeout(showFinalMessage, 900);
+    }
+  }
+
+  function showFinalMessage() {
+    overlayText.textContent = '';
+    overlay.classList.add('sh-overlay-visible');
+    const full = data.winText || '';
+    let i = 0;
+    function typeChar() {
+      if (i <= full.length) {
+        overlayText.textContent = full.slice(0, i);
+        i++;
+        safeTimeout(typeChar, 28);
+      }
+    }
+    typeChar();
+  }
+
+  function handleInteraction(e) {
+    if (busy || shellCount >= TOTAL_SHELLS) return;
+    busy = true;
+
+    if (!firstInteraction) {
+      firstInteraction = true;
+      hint.classList.add('sh-hint-hidden');
+    }
+
+    spawnWave(() => {
+      dropShell();
+      busy = false;
+    });
+  }
+
+  waterZone.addEventListener('click', handleInteraction);
+  waterZone.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleInteraction(e);
+  }, { passive: false });
+
+  dayCleanup = function () {
+    timeouts.forEach(clearTimeout);
+    waterZone.removeEventListener('click', handleInteraction);
+  };
+}
+
+
+/* ---------- BOULE A NEIGE ---------- */
+function initSnowglobe(data, dayNum) {
+  const root = document.getElementById('snowglobe-root');
+  if (!root) return;
+
+  root.innerHTML = `
+    <div class="sg-container">
+      <div class="sg-stage">
+        <div class="sg-globe" id="sg-globe-${dayNum}">
+          <div class="sg-glass">
+            <svg class="sg-scene" viewBox="0 0 200 200" preserveAspectRatio="xMidYMax slice">
+              <defs>
+                <linearGradient id="sg-sky-${dayNum}" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f7d9e4"/>
+                  <stop offset="100%" stop-color="#fdf3f6"/>
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="200" height="200" fill="url(#sg-sky-${dayNum})"/>
+              <ellipse cx="100" cy="185" rx="110" ry="22" fill="#f3e3ea"/>
+              <path d="M0 175 Q50 155 100 175 T200 175 V200 H0 Z" fill="#ffffff" opacity="0.9"/>
+              <circle cx="65" cy="150" r="20" fill="#4a3b42"/>
+              <path d="M65 150 Q60 120 68 100" stroke="#4a3b42" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <circle cx="135" cy="150" r="20" fill="#d98ba8"/>
+              <path d="M135 150 Q140 120 130 100" stroke="#d98ba8" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <path d="M85 128 Q100 138 115 128" stroke="#4a3b42" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+              <g opacity="0.55">
+                <circle cx="30" cy="110" r="8" fill="#ffffff"/>
+                <rect x="27" y="118" width="6" height="30" fill="#e9c9a3"/>
+                <circle cx="170" cy="100" r="10" fill="#ffffff"/>
+                <rect x="166" y="110" width="8" height="40" fill="#e9c9a3"/>
+              </g>
+            </svg>
+            <div class="sg-flakes-layer" id="sg-flakes-${dayNum}"></div>
+          </div>
+          <div class="sg-shine"></div>
+        </div>
+        <div class="sg-base"></div>
+        <p class="sg-hint" id="sg-hint-${dayNum}">Secoue la boule</p>
+      </div>
+      <div class="sg-message" id="sg-message-${dayNum}">
+        <p>${data.winText}</p>
+      </div>
+    </div>
+  `;
+
+  const globe = root.querySelector(`#sg-globe-${dayNum}`);
+  const flakesLayer = root.querySelector(`#sg-flakes-${dayNum}`);
+  const hint = root.querySelector(`#sg-hint-${dayNum}`);
+  const messageEl = root.querySelector(`#sg-message-${dayNum}`);
+
+  let shakeCount = 0;
+  let hasWon = false;
+  let hintHidden = false;
+  let flakes = [];
+  let animId = null;
+  let running = false;
+
+  let dragging = false;
+  let lastX = 0, lastY = 0, lastT = 0;
+  let velocityBuffer = [];
+  let directionChanges = 0;
+  let lastDir = 0;
+
+  let tapTimes = [];
+
+  function hideHint() {
+    if (hintHidden) return;
+    hintHidden = true;
+    hint.classList.add('sg-hint--hidden');
+  }
+
+  function spawnFlakes(count) {
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'sg-flake';
+      const size = 3 + Math.random() * 5;
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      const startX = 20 + Math.random() * 160;
+      const flake = {
+        el,
+        x: startX,
+        y: 20 + Math.random() * 60,
+        vx: (Math.random() - 0.5) * 1.6,
+        vy: Math.random() * 0.6,
+        swayPhase: Math.random() * Math.PI * 2,
+        swaySpeed: 0.02 + Math.random() * 0.03,
+        opacity: 0.7 + Math.random() * 0.3,
+        settled: false
+      };
+      el.style.opacity = flake.opacity;
+      flakesLayer.appendChild(el);
+      flakes.push(flake);
+    }
+    if (flakes.length > 140) {
+      const excess = flakes.splice(0, flakes.length - 140);
+      excess.forEach(f => f.el.remove());
+    }
+    if (!running) {
+      running = true;
+      animId = requestAnimationFrame(tick);
+    }
+  }
+
+  function tick() {
+    flakes.forEach(f => {
+      if (f.settled) return;
+      f.swayPhase += f.swaySpeed;
+      f.x += f.vx * 0.4 + Math.sin(f.swayPhase) * 0.3;
+      f.vy += 0.012;
+      if (f.vy > 1.2) f.vy = 1.2;
+      f.y += f.vy;
+      f.vx *= 0.99;
+
+      if (f.x < 8) f.x = 8;
+      if (f.x > 192) f.x = 192;
+
+      if (f.y >= 178) {
+        f.y = 178;
+        f.settled = true;
+        f.el.style.opacity = f.opacity * 0.5;
+      }
+
+      f.el.style.transform = `translate(${f.x}px, ${f.y}px)`;
+    });
+
+    running = flakes.some(f => !f.settled) || flakes.length > 0;
+    if (flakes.length > 0) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      running = false;
+    }
+  }
+
+  function registerShake() {
+    hideHint();
+    spawnFlakes(28 + Math.floor(Math.random() * 12));
+    shakeCount++;
+    globe.classList.remove('sg-globe--pulse');
+    void globe.offsetWidth;
+    globe.classList.add('sg-globe--pulse');
+
+    if (shakeCount >= 2 && !hasWon) {
+      hasWon = true;
+      setTimeout(() => {
+        messageEl.classList.add('sg-message--visible');
+      }, 700);
+    }
+  }
+
+  function onPointerDown(e) {
+    dragging = true;
+    const p = getPoint(e);
+    lastX = p.x; lastY = p.y; lastT = performance.now();
+    velocityBuffer = [];
+    directionChanges = 0;
+    lastDir = 0;
+
+    const now = performance.now();
+    tapTimes.push(now);
+    tapTimes = tapTimes.filter(t => now - t < 1200);
+    if (tapTimes.length >= 4) {
+      tapTimes = [];
+      registerShake();
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const p = getPoint(e);
+    const now = performance.now();
+    const dt = Math.max(now - lastT, 1);
+    const dx = p.x - lastX;
+    const speed = Math.abs(dx) / dt;
+
+    const dir = dx > 0 ? 1 : (dx < 0 ? -1 : lastDir);
+    if (lastDir !== 0 && dir !== lastDir && speed > 0.35) {
+      directionChanges++;
+    }
+    lastDir = dir;
+
+    velocityBuffer.push(speed);
+    if (velocityBuffer.length > 10) velocityBuffer.shift();
+
+    if (directionChanges >= 3) {
+      directionChanges = 0;
+      registerShake();
+    }
+
+    lastX = p.x; lastY = p.y; lastT = now;
+  }
+
+  function onPointerUp() {
+    dragging = false;
+    directionChanges = 0;
+    lastDir = 0;
+  }
+
+  function getPoint(e) {
+    if (e.touches && e.touches[0]) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  globe.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  globe.addEventListener('touchstart', onPointerDown, { passive: true });
+  window.addEventListener('touchmove', onPointerMove, { passive: true });
+  window.addEventListener('touchend', onPointerUp);
+
+  dayCleanup = function () {
+    globe.removeEventListener('pointerdown', onPointerDown);
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    globe.removeEventListener('touchstart', onPointerDown);
+    window.removeEventListener('touchmove', onPointerMove);
+    window.removeEventListener('touchend', onPointerUp);
+    if (animId) cancelAnimationFrame(animId);
+    flakes.forEach(f => f.el.remove());
+    flakes = [];
+  };
+}
 
 /* ---------- MACHINE A SOUS ---------- */
 function initSlotMachine(data, dayNum){
